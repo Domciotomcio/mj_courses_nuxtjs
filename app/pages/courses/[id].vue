@@ -1,5 +1,14 @@
 <script lang="ts" setup>
 
+async function buyCourse(courseId: number) {
+  const { url } = await $fetch('/api/create-checkout-session', {
+    method: 'POST',
+    body: { courseId }
+  })
+
+  if (url) window.location.href = url
+}
+
 const course = {
   id: 1,
   title: 'Wychowanie dzieci do wiary',
@@ -12,7 +21,6 @@ const course = {
   ],
   price: '99 PLN'
 };
-
 
 </script>
 
@@ -35,8 +43,13 @@ const course = {
     <div>
       <UButton>
         Zakup kurs
-        <UIcon name="i-lucide-shopping-cart"  />
+        <UIcon name="i-lucide-shopping-cart" />
       </UButton>
+    </div>
+    <div>
+      <button @click="buyCourse(course.id)" class="bg-orange-500 text-white px-4 py-2 rounded">
+        Buy
+      </button>
     </div>
   </div>
 </template>

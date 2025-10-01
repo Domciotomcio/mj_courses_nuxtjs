@@ -13,7 +13,8 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/ui',
     'nuxt-vuefire',
-    '@nuxtjs/color-mode'
+    '@nuxtjs/color-mode',
+    '@unlok-co/nuxt-stripe',
   ],
   colorMode: {
     preference: 'light', // default theme
@@ -24,7 +25,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   vuefire: {
     config: {
-      apiKey: "AIzaSyDfOZfLvg0Mxq7MtySVxYRlD2tJV2YqJEs",
+      apiKey: process.env.VUEFIRE_API_KEY,
       authDomain: "mj-courses.firebaseapp.com",
       projectId: "mj-courses",
       storageBucket: "mj-courses.firebasestorage.app",
@@ -35,5 +36,22 @@ export default defineNuxtConfig({
     auth: {
       enabled: true
     },
-  }
+  },
+  stripe: {
+    // Server
+    server: {
+      key: process.env.STRIPE_SECRET_KEY,
+      options: {
+        // your api options override for stripe server side
+        // https://github.com/stripe/stripe-node?tab=readme-ov-file#configuration
+      },
+      // CLIENT
+    },
+    client: {
+      key: process.env.STRIPE_PUBLIC_KEY,
+      // manualClientLoad: true, // if you want to have control where you are going to load the client
+      // your api options override for stripe client side https://stripe.com/docs/js/initializing#init_stripe_js-options
+      options: {},
+    },
+  },
 })
