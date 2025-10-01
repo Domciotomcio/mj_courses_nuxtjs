@@ -1,8 +1,16 @@
-<script setup>
+<script lang="ts" setup>
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const userId = route.params.id
 
 const courses = [
-  { id: 1, title: 'Vue.js Basics', description: 'Learn the fundamentals of Vue.js.' },
+  { id: 1, title: 'Vue.js Basics', description: 'Learn the fundamentals of Vue.js.', image_name: 'vuejs-basics.jpg' },
 ];
+
+function viewCourse(courseId: number) {
+  navigateTo(`/users/${userId}/courses/${courseId}`);
+}
 
 </script>
 

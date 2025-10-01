@@ -6,6 +6,7 @@ const toast = useToast()
 const user = useCurrentUser()
 const route = useRoute()
 const auth = useFirebaseAuth()!
+const userId = user.value?.uid || '1'
 
 const navigationMenuItems = computed<NavigationMenuItem[]>(() => [
   {
@@ -16,8 +17,8 @@ const navigationMenuItems = computed<NavigationMenuItem[]>(() => [
   },
   {
     label: 'Moje kursy',
-    to: '/my-courses',
-    active: route.path.startsWith('/my-courses')
+    to: `/users/${userId}/courses`,
+    active: route.path.startsWith(`/users/${userId}/courses`),
   },
 ])
 
