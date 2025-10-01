@@ -1,6 +1,18 @@
 <script lang="ts" setup>
+import { useCollection, useFirestore, useDocument } from 'vuefire'
+import { collection, doc } from 'firebase/firestore'
+import type { Course } from '../../../types/models/course'
+import { useRoute } from 'vue-router'
 
-async function buyCourse(courseId: number) {
+const route = useRoute()
+const courseId = route.params.id as string
+
+console.log('Course ID from route:', courseId)
+const db = useFirestore()
+const course = useDocument(doc(collection(db, 'courses'), courseId))
+console.log(course)
+
+async function buyCourse(courseId: string) {
   const { url } = await $fetch('/api/create-checkout-session', {
     method: 'POST',
     body: { courseId }
@@ -9,7 +21,7 @@ async function buyCourse(courseId: number) {
   if (url) window.location.href = url
 }
 
-const course = {
+const course2 = {
   id: 1,
   title: 'Wychowanie dzieci do wiary',
   image_name: "course1.jpg",
@@ -27,17 +39,17 @@ const course = {
 <template>
   <div>
     <div class="mb-4 text-center py-8">
-      <h1 class="font-bold text-3xl">{{ course.title }}</h1>
-      <p class="text-gray-600">{{ course.description }}</p>
+      <h1 class="font-bold text-3xl">{{ course?.title }}</h1>
+      <p class="text-gray-600">{{ course?.description }}</p>
     </div>
 
     <div>
       <p>Spotkania</p>
-      <UAccordion :items="course.meetings" />
+      <UAccordion :items="course?.meetings" />
     </div>
 
     <div>
-      Cena za kurs: {{ course.price || 'Jeszcze nie ustalona' }}
+      Cena za kurs: {{ course?.price || 'Jeszcze nie ustalona' }}
     </div>
 
     <div>
@@ -47,7 +59,7 @@ const course = {
       </UButton>
     </div>
     <div>
-      <button @click="buyCourse(course.id)" class="bg-orange-500 text-white px-4 py-2 rounded">
+      <button @click="buyCourse(course!.id || '')" class="bg-orange-500 text-white px-4 py-2 rounded">
         Buy
       </button>
     </div>

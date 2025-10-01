@@ -1,5 +1,12 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
+import { useCollection } from 'vuefire'
+import { collection } from 'firebase/firestore'
+
+const db = useFirestore()
+
+const courses2 = useCollection(collection(db, 'courses'))
+
 
 const route = useRoute()
 const userId = route.params.id

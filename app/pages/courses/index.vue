@@ -1,12 +1,27 @@
-<script setup>
+<script lang="ts" setup>
+import { useCollection, useFirestore } from 'vuefire'
+import { collection } from 'firebase/firestore' 
+import type { Course } from '../../../types/models/course'
 
-const courses = [
-  { id: 1, title: 'Wychowanie dzieci do wiary', image_name: "course1.jpg", description: 'Learn the fundamentals of Vue.js.' },
-  { id: 2, title: 'BÓG MÓWI. SŁUCHAJ GO.', image_name: "course2.jpg", description: 'Build powerful SSR apps with Nuxt.js.' },
-  { id: 3, title: 'Trzeci kurs', image_name: "course3.jpg", description: 'Deep dive into advanced JS concepts.' }
+const db = useFirestore()
+const courses = useCollection<Course>(collection(db, 'courses'))
+
+const courses2: Course[] = [
+  { id: '1', title: 'Wychowanie dzieci do wiary', image_name: "course1.jpg", description: 'Learn the fundamentals of Vue.js.' },
+  { id: '2', title: 'BÓG MÓWI. SŁUCHAJ GO.', image_name: "course2.jpg", description: 'Build powerful SSR apps with Nuxt.js.' },
+  { id: '3', title: 'Trzeci kurs', image_name: "course3.jpg", description: 'Deep dive into advanced JS concepts.' },
+  { id: '1', title: 'Wychowanie dzieci do wiary', image_name: "course1.jpg", description: 'Learn the fundamentals of Vue.js.' },
+  { id: '2', title: 'BÓG MÓWI. SŁUCHAJ GO.', image_name: "course2.jpg", description: 'Build powerful SSR apps with Nuxt.js.' },
+  { id: '3', title: 'Trzeci kurs', image_name: "course3.jpg", description: 'Deep dive into advanced JS concepts.' },
+  { id: '1', title: 'Wychowanie dzieci do wiary', image_name: "course1.jpg", description: 'Learn the fundamentals of Vue.js.' },
+  { id: '2', title: 'BÓG MÓWI. SŁUCHAJ GO.', image_name: "course2.jpg", description: 'Build powerful SSR apps with Nuxt.js.' },
+  { id: '3', title: 'Trzeci kurs', image_name: "course3.jpg", description: 'Deep dive into advanced JS concepts.' },
+  { id: '1', title: 'Wychowanie dzieci do wiary', image_name: "course1.jpg", description: 'Learn the fundamentals of Vue.js.' },
+  { id: '2', title: 'BÓG MÓWI. SŁUCHAJ GO.', image_name: "course2.jpg", description: 'Build powerful SSR apps with Nuxt.js.' },
+  { id: '3', title: 'Trzeci kurs', image_name: "course3.jpg", description: 'Deep dive into advanced JS concepts.' }
 ];
 
-const viewCourse = (courseId) => {
+function viewCourse(courseId: string) {
   // Logic to view the course details
   console.log(`Viewing course with ID: ${courseId}`);
 

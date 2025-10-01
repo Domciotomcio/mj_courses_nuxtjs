@@ -3,6 +3,7 @@ const user = useCurrentUser()
 const colorMode = useColorMode()
 
 colorMode.value = computed(() => 'light')
+
 </script>
 
 <template>

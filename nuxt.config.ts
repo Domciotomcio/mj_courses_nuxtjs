@@ -36,6 +36,9 @@ export default defineNuxtConfig({
     auth: {
       enabled: true
     },
+    firestore: {
+      enabled: true,
+    },
   },
   stripe: {
     // Server
