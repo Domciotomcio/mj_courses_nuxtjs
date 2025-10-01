@@ -1,6 +1,13 @@
+<script setup>
+const user = useCurrentUser()
+const colorMode = useColorMode()
+
+colorMode.value = computed(() => 'light')
+</script>
+
 <template>
-  <div>
-    <NuxtRouteAnnouncer />
-    <NuxtWelcome />
-  </div>
+  <UApp>
+    <NuxtLayout>
+  </NuxtLayout>
+  </UApp>
 </template>
