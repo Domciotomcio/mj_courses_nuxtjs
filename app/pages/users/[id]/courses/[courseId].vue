@@ -3,7 +3,7 @@ import PageTitle from '~/components/PageTitle.vue';
 import { collection, doc } from 'firebase/firestore';
 
 const route = useRoute()
-const courseId = route.params.id as string
+const courseId = route.params.courseId as string
 
 const db = useFirestore()
 const course = useDocument(doc(collection(db, 'courses'), courseId))
