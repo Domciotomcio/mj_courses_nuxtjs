@@ -18,6 +18,7 @@ export interface Course {
   name?: string;
   // UI-friendly title (used in templates)
   title?: string;
+  subtitle?: string;
   slug?: string; // url-friendly identifier
   // image file name placed under /public/courses
   image_name?: string;

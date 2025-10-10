@@ -1,5 +1,13 @@
 <script lang="ts" setup>
 import PageTitle from '~/components/PageTitle.vue';
+import { collection, doc } from 'firebase/firestore';
+
+const route = useRoute()
+const courseId = route.params.id as string
+
+const db = useFirestore()
+const course = useDocument(doc(collection(db, 'courses'), courseId))
+
 
 const pageTitle = 'Szczegóły kursu'
 const pageSubtitle = 'Tutaj znajdziesz wszystkie informacje o kursie'
@@ -13,11 +21,62 @@ const meetings = [
 
 <template>
   <div>
-    <PageTitle :title="pageTitle" :subtitle="pageSubtitle" />
+    <PageTitle :title="course?.title" :subtitle="course?.subtitle" />
 
+    <p>{{ course?.long_description }}</p>
 
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel id sapiente, dolorem doloremque pariatur excepturi corrupti error. Suscipit ad, aspernatur, perspiciatis atque sit consequuntur, accusamus ducimus inventore incidunt cum exercitationem?
-  
-    <u-accordion :items="meetings" class="my-4" />
+    <div class="mt-8"></div>
+
+    <div>
+      <h1>Lista spotkań</h1>
+      <UAccordion type="multiple" :items="course?.meetings">
+        <template #content="{ item }">
+          <template v-if="item!.has_occurred === false">
+            
+            <div class="flex items-start">
+              
+              <div class="pb-3.5 text-sm text-muted flex-1 mr-4">
+                <p class="mb-4">Data spotkania: <NuxtTime :datetime="Date.now()" /></p>
+                <p>{{ item?.description }}</p>
+              </div>
+              <div class="flex-shrink-0 pb-3.5">
+                <UButton :href="item!.meeting_url" target="_blank">
+                  <UIcon name="i-lucide-presentation" />
+                  Dołącz do spotkania
+                </UButton>
+              </div>
+            </div>
+
+          </template>
+          <template v-else>
+            <p class="pb-3.5 text-sm text-muted">
+              {{ item?.description }}
+            </p>
+
+            <div style="display: flex; justify-content: center;">
+              <iframe v-if="item!.video_url" :src="`https://www.youtube.com/embed/${item!.video_url.split('v=')[1]}`"
+                width="560" height="315" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            </div>
+
+          </template>
+        </template>
+      </UAccordion>
+    </div>
+
+    <div class="mt-8"></div>
+
+    <div>
+      <h1>Dodatkowe materiały</h1>
+      <div class="mt-4"></div>
+      <UCard>
+        <template #header>
+          <p>Książka</p>
+          </template>
+
+        
+      </UCard>
+    </div>
   </div>
 </template>

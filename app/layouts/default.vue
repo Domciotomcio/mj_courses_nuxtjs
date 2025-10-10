@@ -1,10 +1,12 @@
 <template>
   <div>
     <AppHeader />
-    <UMain class="p-8">
-      <NuxtPage />
+    <UMain class="mx-32 my-8">
+      <UPage>
+        <NuxtPage />
+      </UPage>
     </UMain>
-    <USeparator icon="i-simple-icons-nuxtdotjs" type="dashed" class="h-px" />
+    <USeparator  type="dashed" class="h-px" />
     <AppFooter />
   </div>
 </template>

@@ -14,7 +14,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     'nuxt-vuefire',
     '@nuxtjs/color-mode',
-    '@unlok-co/nuxt-stripe',
+    '@unlok-co/nuxt-stripe'
   ],
   colorMode: {
     preference: 'light', // default theme
@@ -56,5 +56,8 @@ export default defineNuxtConfig({
       // your api options override for stripe client side https://stripe.com/docs/js/initializing#init_stripe_js-options
       options: {},
     },
+  },
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
   },
 })

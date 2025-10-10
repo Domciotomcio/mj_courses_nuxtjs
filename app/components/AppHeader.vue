@@ -6,7 +6,16 @@ const toast = useToast()
 const user = useCurrentUser()
 const route = useRoute()
 const auth = useFirebaseAuth()!
+
 const userId = user.value?.uid || '1'
+
+const dbUser = useUser(userId as string)
+
+watchEffect(() => {
+  if (user.value) {
+    console.log('Current user in AppHeader:', user.value?.uid)
+  }
+})
 
 const navigationMenuItems = computed<NavigationMenuItem[]>(() => [
   {
@@ -17,31 +26,34 @@ const navigationMenuItems = computed<NavigationMenuItem[]>(() => [
   },
   {
     label: 'Moje kursy',
-    to: `/users/${userId}/courses`,
-    active: route.path.startsWith(`/users/${userId}/courses`),
+    to: `/users/${user.value?.uid}/courses`,
+    active: route.path.startsWith(`/users/${user.value?.uid}/courses`),
   },
 ])
 
 import type { DropdownMenuItem } from '@nuxt/ui'
 
-const items = ref<DropdownMenuItem[][]>([
-  [
+const items = computed<DropdownMenuItem[][]>(() => [
+[
     {
-      label: user.value?.email || 'User email',
-      avatar: {
-        src: 'https://github.com/benjamincanac.png'
-      },
-      type: 'label'
+      label: dbUser.value ? `${dbUser.value.forename} ${dbUser.value.surname}` : 'Użytkownik',
+      icon: 'i-lucide-user',
+      to: `/users/${user.value?.uid}/courses`,
+      active: route.path.startsWith(`/users/${user.value?.uid}/courses`),
     }
-  ],
-  [
+] , 
+[
     {
       label: 'Płatności',
-      icon: 'i-lucide-credit-card'
+      icon: 'i-lucide-credit-card',
+      to: `/users/${user.value?.uid}/payments`,
+      active: route.path.startsWith(`/users/${user.value?.uid}/payments`),
     },
     {
       label: 'Ustawienia',
-      icon: 'i-lucide-cog'
+      icon: 'i-lucide-cog',
+      to: `/users/${user.value?.uid}/settings`,
+      active: route.path.startsWith(`/users/${user.value?.uid}/settings`),
     },
   ],
   [
@@ -54,6 +66,8 @@ const items = ref<DropdownMenuItem[][]>([
     }
   ]
 ])
+
+
 
 function logout() {
   signOut(auth)
@@ -73,6 +87,7 @@ function logout() {
 
     <template #right>
       <div>
+        
         <template v-if="user === undefined">
           <div class="flex items-center gap-4">
             <USkeleton class="h-3 w-[100px]" />
@@ -82,7 +97,7 @@ function logout() {
           <UDropdownMenu :items="items" :ui="{
             content: 'w-48'
           }">
-            <UAvatar icon="i-lucide-user" size="md" class="ml-2" />
+            <UButton icon="i-lucide-user" variant="ghost" />
           </UDropdownMenu>
         </template>
         <template v-else>
@@ -90,6 +105,7 @@ function logout() {
             Zaloguj się
           </UButton>
         </template>
+        <UColorModeButton  size="lg"/>
       </div>
 
     </template>

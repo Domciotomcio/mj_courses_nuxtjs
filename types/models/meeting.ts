@@ -7,4 +7,6 @@ export interface Meeting {
     time: string; // e.g., "14:00"
     duration: number; // duration in minutes
     topic: string;
+    has_occurred?: boolean; // indicates if the meeting has already taken place
+    description?: string;
 }

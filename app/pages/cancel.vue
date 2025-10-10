@@ -1,5 +1,5 @@
 <template>
   <div class="p-6 text-red-600 font-bold">
-    Payment cancelled. You can try again.
+    Płatność została anulowana. Wróć do strony z kursami i spróbuj ponownie.
   </div>
 </template>
