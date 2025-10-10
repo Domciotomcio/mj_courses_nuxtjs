@@ -15,7 +15,7 @@ function login(email: string, password: string) {
 
     signInWithEmailAndPassword(auth, email, password)
         .then(() => {
-            navigateTo('/my-courses')
+            navigateTo('/courses')
             toast.add({ title: 'Sukces', description: 'Zalogowano pomyślnie' })
         })
         .catch((err) => {
