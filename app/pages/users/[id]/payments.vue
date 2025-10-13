@@ -1,5 +1,9 @@
 <script setup lang="ts">
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const title = 'Płatności'
 const subtitle = 'Historia twoich płatności'
 

@@ -2,6 +2,10 @@
 import PageTitle from '~/components/PageTitle.vue';
 import { collection, doc } from 'firebase/firestore';
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const route = useRoute()
 const courseId = route.params.courseId as string
 

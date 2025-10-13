@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const route = useRoute()
 const userId = route.params.id as string
 

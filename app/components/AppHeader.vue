@@ -17,26 +17,33 @@ watchEffect(() => {
   }
 })
 
-const navigationMenuItems = computed<NavigationMenuItem[]>(() => [
-  {
-    label: 'Wszystkie kursy',
-    to: '/courses',
-    active: route.path.startsWith('/courses'),
-
-  },
-  {
-    label: 'Moje kursy',
-    to: `/users/${user.value?.uid}/courses`,
-    active: route.path.startsWith(`/users/${user.value?.uid}/courses`),
-  },
-])
+const navigationMenuItems = computed<NavigationMenuItem[]>(() => {
+  const items: NavigationMenuItem[] = [
+    {
+      label: 'Wszystkie kursy',
+      to: '/courses',
+      active: route.path.startsWith('/courses'),
+    }
+  ]
+  
+  // Only show "Moje kursy" if user is logged in
+  if (user.value) {
+    items.push({
+      label: 'Moje kursy',
+      to: `/users/${user.value.uid}/courses`,
+      active: route.path.startsWith(`/users/${user.value.uid}/courses`),
+    })
+  }
+  
+  return items
+})
 
 import type { DropdownMenuItem } from '@nuxt/ui'
 
 const items = computed<DropdownMenuItem[][]>(() => [
 [
     {
-      label: dbUser.value ? `${dbUser.value.forename} ${dbUser.value.surname}` : 'Użytkownik',
+      label: user.value?.email ? `Witaj, ${user.value.email}` : 'Witaj, Użytkownik',
       icon: 'i-lucide-user',
       to: `/users/${user.value?.uid}/courses`,
       active: route.path.startsWith(`/users/${user.value?.uid}/courses`),
@@ -80,13 +87,18 @@ function logout() {
 <template>
   <UHeader>
     <template #title>
-      <img src="/jonatan-logo.png" alt="Logo" class="h-12 w-32 mr-2" />
+      <UColorModeImage 
+        light="/jonatan-logo.png" 
+        dark="/jonatan-logo-biale.png" 
+        alt="Logo" 
+        class="h-12 w-32 mr-2" 
+      />
     </template>
 
     <UNavigationMenu :items="navigationMenuItems" />
 
     <template #right>
-      <div>
+      <div class="flex items-center gap-2">
         
         <template v-if="user === undefined">
           <div class="flex items-center gap-4">
@@ -96,7 +108,8 @@ function logout() {
         <template v-else-if="user">
           <UDropdownMenu :items="items" :ui="{
             content: 'w-48'
-          }">
+          }"
+          >
             <UButton icon="i-lucide-user" variant="ghost" />
           </UDropdownMenu>
         </template>
