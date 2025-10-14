@@ -7,14 +7,14 @@ export default defineNuxtConfig({
     experimental: { nativeSqlite: true }
   },
   modules: [
-    '@nuxt/content',
     '@nuxt/eslint',
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/ui',
     'nuxt-vuefire',
     '@nuxtjs/color-mode',
-    '@unlok-co/nuxt-stripe'
+    '@unlok-co/nuxt-stripe',
+    '@nuxt/content',
   ],
   colorMode: {
     preference: 'light', // default theme
