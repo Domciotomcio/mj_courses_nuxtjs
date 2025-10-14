@@ -32,23 +32,42 @@ function toggleView() {
     </div>
 
     <!-- Grid View -->
-    <div v-if="!isListView">
-      <UBlogPosts>
-        <UBlogPost
-          v-for="course in courses"
-          :key="course.id"
-          v-bind="course"
-          :to="`/courses/${course.id}`"
-          :ui="{
-            description: 'mt-1 text-base text-pretty line-clamp-3'
-          }"
-        />
-      </UBlogPosts>
-    </div>
+    <Transition name="fade" mode="out-in">
+      <div v-if="!isListView" key="grid">
+        <UBlogPosts>
+          <UBlogPost
+            v-for="course in courses"
+            :key="course.id"
+            v-bind="course"
+            :to="`/courses/${course.id}`"
+            :ui="{
+              description: 'mt-1 text-base text-pretty line-clamp-3'
+            }"
+          />
+        </UBlogPosts>
+      </div>
 
-    <!-- List View -->
-    <div v-else class="container mx-auto px-4">
-      <CourseListView :courses="courses" />
-    </div>
+      <!-- List View -->
+      <div v-else class="container mx-auto px-4" key="list">
+        <CourseListView :courses="courses" />
+      </div>
+    </Transition>
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>

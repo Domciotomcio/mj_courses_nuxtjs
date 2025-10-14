@@ -27,7 +27,41 @@ const meetings = [
   <div>
     <PageTitle :title="course?.title" :subtitle="course?.subtitle" />
 
-    <p>{{ course?.long_description }}</p>
+    <div class="container mx-auto px-4 py-8 prose dark:prose-invert max-w-none">
+      <p class="text-lg">
+        Cieszymy się, że chcesz wyruszyć z nami w tę drogę odkrywania, jak prowadzić dzieci ku dojrzałej i autentycznej wierze.
+      </p>
+      
+      <p>
+        To przestrzeń, w której możesz zatrzymać się, posłuchać, podzielić doświadczeniem i pozwolić, by Bóg działał w Twoim rodzicielstwie.
+      </p>
+
+      <p class="font-semibold">Poniżej znajdziesz:</p>
+      <ul>
+        <li>nagrania minionych spotkań,</li>
+        <li>terminy kolejnych sesji na żywo,</li>
+        <li>materiały dodatkowe.</li>
+      </ul>
+
+      <p>
+        Zachęcamy, byś uczestniczył w spotkaniach <strong>aktywnie</strong> – notuj swoje myśli, pytania, poruszenia serca. 
+        Możesz też wracać do nagrań w dowolnym momencie, w rytmie swojego życia rodzinnego.
+      </p>
+
+      <UAlert
+        color="primary"
+        variant="soft"
+        title="Niech ten kurs stanie się dla Ciebie przestrzenią spotkania z Bogiem, odnowienia wiary i odkrycia radości rodzicielstwa, które prowadzi do Niego."
+        class="my-6"
+      />
+
+      <UCard class="bg-primary-50 dark:bg-primary-950/20 border-l-4 border-primary-500">
+        <p class="italic text-base">
+          „Młody człowiek doświadczony miłością Bożą, powołaniem i misją, wsparty mądrością dorosłych, 
+          może wydobyć z siebie najpiękniejsze skarby Bożej łaski."
+        </p>
+      </UCard>
+    </div>
 
     <div class="mt-8"></div>
 
