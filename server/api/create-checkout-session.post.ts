@@ -2,7 +2,7 @@ import { defineEventHandler } from "h3";
 import { useServerStripe } from "#stripe/server";
 
   const courses = [
-  { id: "UYmphsTDzCSCmUxtzBxT", title: 'Wychowanie dzieci do wiary', priceCents: 10000 },
+  { id: "UYmphsTDzCSCmUxtzBxT", title: 'Wychowanie dzieci do wiary', priceCents: 32000 },
 ]
 
 export default defineEventHandler(async (event) => {

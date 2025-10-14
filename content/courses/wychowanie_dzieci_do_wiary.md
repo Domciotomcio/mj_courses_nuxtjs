@@ -41,7 +41,7 @@ Jest założycielem wspólnoty Kompania Jonatana, która obejmuje dzieci, młodz
 Wierzy, że wiara młodych jest darem, który dojrzewa w obecności dorosłych zdolnych kochać, słuchać i prowadzić z nadzieją.
 ::
 
-::quote{author="Artur Skowron" role="Ewangelizator, założyciel Misji Jonatan"}
+::quote{}
 Młody człowiek doświadczony miłością Bożą, powołaniem i misją, wsparty mądrością dorosłych, może wydobyć z siebie najpiękniejsze skarby Bożej łaski.
 ::
 

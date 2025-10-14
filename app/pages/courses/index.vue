@@ -10,7 +10,7 @@ const courses = useCollection<Course>(collection(db, 'courses'))
 
 <template>
   <div>
-    <page-title title="Wszystkie kursy" subtitle="Misja Jonatan - Kursy online" />
+    <page-title class="mb-8" title="Wszystkie kursy" subtitle="Misja Jonatan - Kursy online" />
     <UBlogPosts :posts="courses" />
   </div>
 </template>

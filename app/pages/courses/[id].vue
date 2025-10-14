@@ -2,6 +2,8 @@
 import { useFirestore, useDocument } from 'vuefire'
 import { collection, doc } from 'firebase/firestore'
 import { useRoute } from 'vue-router'
+import CourseMeetingItem from '~/components/CourseMeetingItem.vue'
+import CourseMeetings from '~/components/CourseMeetings.vue'
 
 const route = useRoute()
 const courseId = route.params.id as string
@@ -66,22 +68,9 @@ const course2 = {
       </div>
     </div>
 
-    <div class="container mx-auto px-4 py-8">
-      <h3>Lista spotkań</h3>
-      <div class="m-4">
-        <UAccordion type="multiple" :items="course?.meetings">
-          <template #content="{ item }">
-            
-            <div class="pb-3.5 text-sm text-muted flex-1 mr-4">
-                  <p class="mb-4">Data spotkania: <NuxtTime :datetime="Date.now()" /></p>
-                  <p>{{ item?.description }}</p>
-                </div>
-          </template>
-        </UAccordion>
-      </div>
-    </div>
+    <CourseMeetings :meetings="course?.meetings" />
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4">
       <h3>Podsumowanie</h3>
       <CoursePurchaseSummary 
         :price="course?.price" 
