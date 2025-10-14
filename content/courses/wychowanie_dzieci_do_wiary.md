@@ -48,7 +48,7 @@ Młody człowiek doświadczony miłością Bożą, powołaniem i misją, wsparty
 ::call-to-action{title="Gotowy, by odkryć, jak Twoja wiara może przemieniać życie Twoich dzieci?" description="Dołącz do kursu i rozpocznij tę wyjątkową podróż już dziś."}
 ::
 
-::features-grid
+::features-grid{:features='[{"icon":"i-lucide-presentation","title":"Spotkania na żywo","description":"Interaktywne sesje z prowadzącym w czasie rzeczywistym","color":"blue"},{"icon":"i-lucide-video","title":"Materiały wideo","description":"Wysokiej jakości nagrania dostępne 24/7","color":"green"},{"icon":"i-lucide-book-open","title":"Książka w prezencie","description":"W pakiecie otrzymujesz dostęp elektroniczny do książki Mamo! Tato! Chcę do Kościoła!","color":"red"},{"icon":"i-lucide-infinity","title":"Dożywotni dostęp","description":"Wracaj do materiałów kiedy tylko chcesz","color":"purple"}]'}
 ::
 
 

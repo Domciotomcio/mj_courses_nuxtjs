@@ -13,6 +13,20 @@ const db = useFirestore()
 const course = useDocument(doc(collection(db, 'courses'), courseId))
 console.log(course)
 
+// Load content based on course_markdown_name
+const { data: courseContent } = await useAsyncData(
+  `course-content-${courseId}`,
+  async () => {
+    if (!course.value?.course_markdown_name) return null
+    return queryCollection('content')
+      .path(`/courses/${course.value.course_markdown_name}`)
+      .first()
+  },
+  {
+    watch: [course]
+  }
+)
+
 async function buyCourse(courseId: string) {
   const { url } = await $fetch('/api/create-checkout-session', {
     method: 'POST',
@@ -42,16 +56,18 @@ const course2 = {
     <PageTitle :title="course?.title" :subtitle="course?.subtitle" />
 
     <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">Opis kursu</h1>
-      
-      <CourseDescription 
-        :description="course?.long_description"
-        :image-name="course?.image_name"
+      <ContentRenderer
+        v-if="courseContent"
+        :value="courseContent"
+        class="prose dark:prose-invert max-w-none"
       />
+      <div v-else class="text-center py-8 text-gray-500 dark:text-gray-400">
+        <p>Ładowanie opisu kursu...</p>
+      </div>
     </div>
 
     <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Lista spotkań</h1>
+      <h3>Lista spotkań</h3>
       <div class="m-4">
         <UAccordion type="multiple" :items="course?.meetings">
           <template #content="{ item }">
@@ -66,25 +82,12 @@ const course2 = {
     </div>
 
     <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Podsumowanie</h1>
-      <div class="max-w-3xl ml-auto bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-md">
-        <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-          <span class="text-lg font-semibold text-gray-700 dark:text-gray-300">Cena za kurs:</span>
-          <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-            {{ course?.price || 'Jeszcze nie ustalona' }} zł
-          </span>
-        </div>
-        <div class="flex justify-end">
-          <UButton 
-            @click="buyCourse(course!.id || '')" 
-            size="xl"
-            icon="i-lucide-shopping-cart"
-            trailing
-          >
-            Zakup kurs
-          </UButton>
-        </div>
-      </div>
+      <h3>Podsumowanie</h3>
+      <CoursePurchaseSummary 
+        :price="course?.price" 
+        :course-id="course?.id || ''"
+        @purchase="buyCourse"
+      />
     </div>
   </div>
 </template>

@@ -44,27 +44,27 @@ const defaultFeatures: Feature[] = [
   {
     icon: 'i-lucide-presentation',
     title: 'Spotkania na żywo',
-    description: 'Interaktywne sesje z prowadzącym w czasie rzeczywistym',
+    description: 'Rozmowy i refleksje w czasie rzeczywistym — z możliwością zadawania pytań i dzielenia się doświadczeniem',
     color: 'blue'
   },
   {
     icon: 'i-lucide-video',
     title: 'Materiały wideo',
-    description: 'Wysokiej jakości nagrania dostępne 24/7',
+    description: 'Nagrania wszystkich spotkań dostępne o każdej porze — wracaj do nich wtedy, gdy potrzebujesz',
     color: 'green'
-  },
-  {
-    icon: 'i-lucide-book-open',
-    title: 'Darmowa książka',
-    description: 'E-book z najważniejszymi treściami kursu w formacie PDF',
-    color: 'red'
   },
   {
     icon: 'i-lucide-infinity',
     title: 'Dożywotni dostęp',
-    description: 'Wracaj do materiałów kiedy tylko chcesz',
+    description: 'Po zakończeniu kursu zachowujesz pełen dostęp do wszystkich treści, by móc wracać do nich w swojej codziennej drodze wiary i rodzicielstwa',
     color: 'purple'
-  }
+  },
+  {
+    icon: 'i-lucide-book-open',
+    title: 'Książka w prezencie',
+    description: 'Książka w prezencie',
+    color: 'red'
+  },
 ]
 
 const displayFeatures = computed(() => props.features || defaultFeatures)
