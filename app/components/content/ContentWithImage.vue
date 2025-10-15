@@ -5,6 +5,7 @@ interface Props {
   imagePosition?: 'left' | 'right'
   imageSize?: 'small' | 'medium' | 'large'
   sticky?: boolean
+  title?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,7 +28,6 @@ const contentSizeClasses = {
 </script>
 
 <template>
-  <div class="my-8 not-prose max-w-full">
     <div class="flex flex-col gap-8 items-start" :class="imagePosition === 'left' ? 'lg:flex-row-reverse' : 'lg:flex-row'">
       <!-- Content Section -->
       <div class="w-full prose dark:prose-invert max-w-none prose-p:mb-6" :class="contentSizeClasses[imageSize]">
@@ -45,5 +45,4 @@ const contentSizeClasses = {
         </div>
       </div>
     </div>
-  </div>
 </template>

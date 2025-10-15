@@ -18,17 +18,23 @@ function toggleView() {
 
 <template>
   <div>
-    <page-title class="mb-8" title="Wszystkie kursy" subtitle="Misja Jonatan - Kursy online" />
-    
-    <!-- View Toggle Button -->
-    <div class="container mx-auto px-4 mb-6 flex justify-end">
-      <UButton
-        :icon="isListView ? 'i-lucide-grid-2x2' : 'i-lucide-list'"
-        :label="isListView ? 'Widok siatki' : 'Widok listy'"
-        @click="toggleView"
-        color="neutral"
-        variant="outline"
-      />
+    <!-- Header: centered PageTitle with a button pinned to the top-right -->
+    <div class="relative mb-8">
+      <!-- Centered title container -->
+      <div class="container mx-auto px-4 text-center">
+        <page-title title="Wszystkie kursy" subtitle="Misja Jonatan - Kursy online" />
+      </div>
+
+      <!-- Toggle button pinned to the top-right of the same header area -->
+      <div class="absolute right-4 top-0">
+        <UButton
+          :icon="isListView ? 'i-lucide-grid-2x2' : 'i-lucide-list'"
+          :label="isListView ? 'Widok siatki' : 'Widok listy'"
+          @click="toggleView"
+          color="neutral"
+          variant="outline"
+        />
+      </div>
     </div>
 
     <!-- Grid View -->

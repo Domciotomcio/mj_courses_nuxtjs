@@ -32,9 +32,8 @@ const getDateFromTimestamp = (date: any): Date | null => {
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <h3>Lista spotkań</h3>
-    <div class="m-4">
+  <UCard variant="outline" class="w-full">
+    <div class="p-0">
       <UAccordion type="multiple" :items="props.meetings">
         <template #default="{ item, index, open }">
           <div class="flex items-center justify-between w-full">
@@ -47,9 +46,11 @@ const getDateFromTimestamp = (date: any): Date | null => {
           </div>
         </template>
         <template #content="{ item }">
-          <CourseMeetingItem :item="item" />
+          <div class="">
+            <CourseMeetingItem :item="item" />
+          </div>
         </template>
       </UAccordion>
     </div>
-  </div>
+  </UCard>
 </template>

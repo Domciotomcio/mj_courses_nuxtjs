@@ -41,16 +41,12 @@ const props = defineProps<Props>()
             <p v-if="course.description" class="text-sm md:text-base text-gray-300 line-clamp-2 mb-4">
               {{ course.description }}
             </p>
-            
-            <!-- Course Info -->
-            <div class="flex flex-wrap items-center gap-4 text-sm">
-              <div v-if="course.price" class="flex items-center gap-2">
-                <UIcon name="i-lucide-tag" class="w-4 h-4" />
-                <span class="font-semibold">{{ course.price }} zł</span>
-              </div>
-              <div v-if="course.meetings?.length" class="flex items-center gap-2">
-                <UIcon name="i-lucide-calendar" class="w-4 h-4" />
-                <span>{{ course.meetings.length }} spotkań</span>
+          
+            <!-- Book description (optional) -->
+            <div v-if="course.book_desc" class="text-sm text-gray-100">
+              <div class="flex items-center gap-3">
+                <UIcon name="i-lucide-book" class="w-4 h-4" />
+                <span>{{ course.book_desc }}</span>
               </div>
             </div>
           </div>

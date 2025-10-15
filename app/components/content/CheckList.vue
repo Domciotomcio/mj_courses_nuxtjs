@@ -10,15 +10,14 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="my-6">
-    <h3 v-if="title" class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-      <UIcon :name="icon" class="w-6 h-6 text-primary-600" />
+  <u-card variant="solid">
+    <h3 v-if="title" class="text-xl font-bold text-white dark:text-gray-100 mb-3">
       {{ title }}
     </h3>
     <div class="check-list-content">
       <slot />
     </div>
-  </div>
+  </u-card>
 </template>
 
 <style scoped>
@@ -35,7 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  color: rgb(55 65 81);
+  color: #ffffff; /* white text in light mode */
   line-height: 1.5;
 }
 
@@ -44,20 +43,21 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 .check-list-content :deep(li::before) {
-  content: '✓';
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  content: '';
+  display: inline-block;
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;
   margin-top: 0.125rem;
-  color: rgb(22 163 74);
-  font-weight: bold;
-  font-size: 1rem;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  /* lightweight lucide-like check-circle SVG encoded as data URL */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EA580C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='M9 12l2 2 4-4'/></svg>");
 }
 
 :deep(.dark) .check-list-content :deep(li::before) {
-  color: rgb(74 222 128);
+  /* slightly lighter primary for dark mode */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFB57A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='M9 12l2 2 4-4'/></svg>");
 }
 </style>

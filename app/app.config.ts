@@ -30,8 +30,8 @@ export default defineAppConfig({
         }
       },
       p: {
-        base: 'my-5 leading-7 text-pretty'
-      },
+        base: 'text-pretty'
+      }
     }
   }
 })
