@@ -27,6 +27,7 @@
     "firebase-functions": "^6.4.0",
     "locale": "link:@nuxt/ui/locale",
     "nuxt": "^4.1.2",
+    "nuxt-mcp": "^0.2.4",
     "nuxt-vuefire": "1.1.0",
     "stripe-next": "^1.0.35",
     "typescript": "^5.9.2",

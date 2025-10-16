@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@unlok-co/nuxt-stripe',
     '@nuxt/content',
+    'nuxt-mcp'
   ],
   colorMode: {
     preference: 'light', // default theme
