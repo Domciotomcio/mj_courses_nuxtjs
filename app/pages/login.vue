@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 
 const auth = useFirebaseAuth()!
@@ -50,7 +49,16 @@ const fields: AuthFormField[] = [{
                 description="Wprowadź dane logowania, aby uzyskać dostęp do swojego konta." icon="i-lucide-user"
                 :fields="fields" :providers="providers" :submit="{
                     label: 'Zaloguj się',
-                }" @submit="login(fields[0].value, fields[1].value)" />
+                }" @submit="login(fields[0].value, fields[1].value)">
+                <template #footer>
+                    <div class="text-center text-sm text-muted">
+                        Nie masz jeszcze konta?
+                        <ULink to="/register" class="text-primary font-medium">
+                            Zarejestruj się
+                        </ULink>
+                    </div>
+                </template>
+            </UAuthForm>
         </UPageCard>
     </div>
 </template>

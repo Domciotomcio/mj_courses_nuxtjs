@@ -31,6 +31,7 @@ const { data: courseContent } = await useAsyncData(
 )
 
 async function buyCourse(courseId: string) {
+  console.log('courseId:', courseId)
   const { url } = await $fetch('/api/create-checkout-session', {
     method: 'POST',
     body: { courseId, userUid }

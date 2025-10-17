@@ -1,9 +1,6 @@
 import { defineEventHandler, readRawBody } from 'h3'
 import Stripe from 'stripe'
-import { computed } from 'vue'
-import { useFirestore, useCollection } from 'vuefire'
-import { query, where, limit, doc, collection, updateDoc, arrayUnion } from 'firebase/firestore'
-import { initializeApp } from 'firebase/app'
+import { useFirebaseAdmin } from '../utils/firebase-admin'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -14,7 +11,7 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
 // stripe listen --forward-to localhost:3000/api/webhook
 
 export default defineEventHandler(async (event) => {
-  console.log('Received Stripe webhook event -\-\-\\-\-\-\-\\-\-\-\-\\-\-\-\-\\-\-\-\-\\-\-\-\-\\-\-\-\-\\-\-\-\-\\-\-\-')
+  console.log('Received Stripe webhook event ----------------------')
 
   const body = await readRawBody(event) // must use raw body for signature verification
   const sig = event.node.req.headers['stripe-signature'] as string
@@ -34,26 +31,54 @@ export default defineEventHandler(async (event) => {
     const userUid = session.metadata?.userUid
     console.log('✅ Payment succeeded for course:', courseId, 'session:', session.id)
 
-    // TODO: Fix initializeApp error "Firebase App named '[DEFAULT]' already exists"
-    const db = useFirestore()
-    const userQuery = query(collection(db, 'users'), where('uid', '==', userUid), limit(1))
-    const users = useCollection(userQuery)
-    const user = computed(() => users.value[0] || null)
-
-    // add to user.courses the refference to the courseId
-    if (user.value) {
-      const userRef = doc(db, 'users', user.value.id)
-      await updateDoc(userRef, {
-        courses: arrayUnion(courseId)
-      })
-      console.log(`Course ${courseId} added to user ${user.value.id}`)
-    } else {
-      console.error('User not found for session:', session.id)
+    if (!courseId || !userUid) {
+      console.error('Missing courseId or userUid in session metadata')
+      return { received: true, error: 'Missing metadata' }
     }
 
-    // TODO: Update your database to mark the course as paid for the user
-    // Example:
-    // await db.courses.update({ paid: true }).where({ id: courseId })
+    try {
+      // Use Firebase Admin SDK for server-side operations
+      const { db } = useFirebaseAdmin()
+      
+      // Query users collection to find the user by uid
+      const usersSnapshot = await db.collection('users')
+        .where('uid', '==', userUid)
+        .limit(1)
+        .get()
+
+      if (usersSnapshot.empty) {
+        console.error('User not found for uid:', userUid)
+        return { received: true, error: 'User not found' }
+      }
+
+      // Get the user document
+      const userDoc = usersSnapshot.docs[0]
+      const userData = userDoc.data()
+      
+      // Create Firestore document reference to the course
+      const courseDocRef = db.collection('courses').doc(courseId)
+      
+      // Add course reference to user's courses array (avoid duplicates)
+      const currentCourses = userData.courses || []
+      
+      // Check if course reference already exists by comparing paths
+      const courseRefExists = currentCourses.some((ref: any) => 
+        ref.path === courseDocRef.path || ref.id === courseId
+      )
+      
+      if (!courseRefExists) {
+        await userDoc.ref.update({
+          courses: [...currentCourses, courseDocRef]
+        })
+        console.log(`✅ Course reference ${courseDocRef.path} added to user ${userDoc.id}`)
+      } else {
+        console.log(`ℹ️  Course reference already exists for user ${userDoc.id}`)
+      }
+      
+    } catch (error) {
+      console.error('Error updating user courses:', error)
+      return { received: true, error: 'Failed to update user' }
+    }
   }
 
   return { received: true }

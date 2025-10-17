@@ -4,9 +4,5 @@
       "type": "http",
       "url": "https://ui.nuxt.com/mcp"
     },
-    "nuxt-docs": {
-      "type": "sse",
-      "url": "https://mcp.nuxt.com/sse"
-    },
   }
 }

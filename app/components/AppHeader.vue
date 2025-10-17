@@ -114,9 +114,14 @@ function logout() {
           </UDropdownMenu>
         </template>
         <template v-else>
-          <UButton to="/login" color="primary" variant="outline">
-            Zaloguj się
-          </UButton>
+          <div class="flex items-center gap-2">
+            <UButton to="/login" color="neutral" variant="link">
+              Zaloguj się
+            </UButton>
+            <UButton to="/register" color="primary" variant="solid" icon="i-lucide-user-plus">
+              Zarejestruj się
+            </UButton>
+          </div>
         </template>
         <UColorModeButton  size="lg"/>
       </div>

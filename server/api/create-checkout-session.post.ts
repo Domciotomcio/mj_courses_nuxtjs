@@ -1,29 +1,48 @@
 import { defineEventHandler } from "h3";
 import { useServerStripe } from "#stripe/server";
-
-  const courses = [
-  { id: "UYmphsTDzCSCmUxtzBxT", title: 'Wychowanie dzieci do wiary', priceCents: 32000 },
-]
+import { useFirebaseAdmin } from "../utils/firebase-admin";
 
 export default defineEventHandler(async (event) => {
-  // Create a PaymentIntent with the amount, currency, and a payment method type.
-  //
-  // See the documentation [0] for the full list of supported parameters.
-  //
-  // [0] https://stripe.com/docs/api/payment_intents/create
   console.log('Creating checkout session...');
 
   const stripe = await useServerStripe(event);
   const body = await readBody(event)
   console.log('Request body:', body);
-  const course = courses.find(c => c.id === body.courseId);
+  
+  const courseId = body.courseId;
   const userUid = body.userUid;
 
-  console.log('Creating checkout session... 2');
-  console.log('Course:', course);
+  if (!courseId) {
+    throw createError({ statusCode: 400, statusMessage: 'Course ID is required' })
+  }
+
+  // Fetch course from Firestore
+  const { db } = useFirebaseAdmin();
+  const courseDoc = await db.collection('courses').doc(courseId).get();
+
+  if (!courseDoc.exists) {
+    throw createError({ statusCode: 404, statusMessage: 'Course not found' })
+  }
+
+  const courseData = courseDoc.data();
+  console.log('Course data from Firestore:', courseData);
+
+  // Convert price to cents (Stripe expects amounts in smallest currency unit)
+  const price = courseData?.price || 0;
+  const priceCents = Math.round(price * 100);
+
+  const course = {
+    id: courseId,
+    title: courseData?.title || 'Kurs',
+    priceCents: priceCents
+  };
+
+  console.log('Course for Stripe:', course);
   console.log('User UID:', userUid);
 
-  if (!course) throw createError({ statusCode: 404, statusMessage: 'Course not found' })
+  if (priceCents <= 0) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid course price' })
+  }
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card', 'p24'],
