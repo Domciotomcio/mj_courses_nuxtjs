@@ -8,10 +8,19 @@ const courses = useCollection<Course>(collection(db, 'courses'))
 
 // View toggle state
 const isListView = ref(false)
+const showFinishedCourses = ref(false)
 
 function toggleView() {
   isListView.value = !isListView.value
 }
+
+// Filter courses based on finished status
+const filteredCourses = computed(() => {
+  if (showFinishedCourses.value) {
+    return courses.value
+  }
+  return courses.value.filter(course => !course.is_finished)
+})
 
 
 </script>
@@ -20,19 +29,37 @@ function toggleView() {
   <div>
     <!-- Header: centered PageTitle with a button pinned to the top-right -->
     <div class="relative mb-8">
+      <!-- Checkbox in top-left corner (desktop only) -->
+      <div class="absolute left-4 top-0 z-10 hidden sm:block">
+        <UCheckbox v-model="showFinishedCourses" label="Pokaż zakończone kursy" />
+      </div>
+
       <!-- Centered title container -->
       <div class="container mx-auto px-4 text-center">
         <page-title title="Wszystkie kursy" subtitle="Misja Jonatan - Kursy online" />
+        
+        <!-- Checkbox below title (mobile only) -->
+        <div class="mt-4 sm:hidden flex justify-center">
+          <UCheckbox v-model="showFinishedCourses" label="Pokaż zakończone kursy" />
+        </div>
       </div>
 
       <!-- Toggle button pinned to the top-right of the same header area -->
-      <div class="absolute right-4 top-0">
+      <div class="absolute right-4 top-0 flex items-center gap-2 z-10">
+        <UButton
+          :icon="isListView ? 'i-lucide-grid-2x2' : 'i-lucide-list'"
+          @click="toggleView"
+          color="neutral"
+          variant="outline"
+          class="lg:hidden"
+        />
         <UButton
           :icon="isListView ? 'i-lucide-grid-2x2' : 'i-lucide-list'"
           :label="isListView ? 'Widok siatki' : 'Widok listy'"
           @click="toggleView"
           color="neutral"
           variant="outline"
+          class="hidden lg:inline-flex"
         />
       </div>
     </div>
@@ -42,10 +69,14 @@ function toggleView() {
       <div v-if="!isListView" key="grid">
         <UBlogPosts>
           <UBlogPost
-            v-for="course in courses"
+            v-for="course in filteredCourses"
             :key="course.id"
             v-bind="course"
-            :to="`/courses/${course.id}`"
+            :to="course.is_finished ? undefined : `/courses/${course.id}`"
+            :class="{ 
+              'opacity-50 grayscale cursor-not-allowed': course.is_finished,
+              'cursor-pointer': !course.is_finished
+            }"
             :ui="{
               description: 'mt-1 text-base text-pretty line-clamp-3'
             }"
@@ -55,7 +86,7 @@ function toggleView() {
 
       <!-- List View -->
       <div v-else class="container mx-auto px-4" key="list">
-        <CourseListView :courses="courses" />
+        <CourseListView :courses="filteredCourses" />
       </div>
     </Transition>
   </div>

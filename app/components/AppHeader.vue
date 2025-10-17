@@ -43,14 +43,6 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 const items = computed<DropdownMenuItem[][]>(() => [
 [
     {
-      label: user.value?.email ? `Witaj, ${user.value.email}` : 'Witaj, Użytkownik',
-      icon: 'i-lucide-user',
-      to: `/users/${user.value?.uid}/courses`,
-      active: route.path.startsWith(`/users/${user.value?.uid}/courses`),
-    }
-] , 
-[
-    {
       label: 'Płatności',
       icon: 'i-lucide-credit-card',
       to: `/users/${user.value?.uid}/payments`,
@@ -110,11 +102,16 @@ function logout() {
             content: 'w-48'
           }"
           >
-            <UButton icon="i-lucide-user" variant="ghost" />
+            <UButton icon="i-lucide-user" variant="ghost">
+              <span class="hidden lg:inline">
+                Witaj, {{ dbUser?.forename || user.email }}
+              </span>
+            </UButton>
           </UDropdownMenu>
         </template>
         <template v-else>
-          <div class="flex items-center gap-2">
+          <!-- Show login/register only on large screens in header -->
+          <div class="flex items-center gap-2 hidden sm:flex">
             <UButton to="/login" color="neutral" variant="link">
               Zaloguj się
             </UButton>
@@ -126,6 +123,27 @@ function logout() {
         <UColorModeButton  size="lg"/>
       </div>
 
+    </template>
+
+    <template #body>
+      <UNavigationMenu :items="navigationMenuItems" orientation="vertical" class="-mx-2.5" />
+      
+      <div v-if="user" class="mt-4 pt-4 border-t border-default">
+        <UNavigationMenu :items="items.flat().map(item => ({
+          label: item.label,
+          icon: item.icon,
+          to: item.to,
+          onSelect: item.onSelect
+        }))" orientation="vertical" class="-mx-2.5" />
+      </div>
+      <div v-else class="mt-4 pt-4 border-t border-default flex flex-col gap-2">
+        <UButton to="/login" color="neutral" variant="ghost" block>
+          Zaloguj się
+        </UButton>
+        <UButton to="/register" color="primary" variant="solid" icon="i-lucide-user-plus" block>
+          Zarejestruj się
+        </UButton>
+      </div>
     </template>
 
   </UHeader>

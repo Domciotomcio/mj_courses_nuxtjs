@@ -6,11 +6,22 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const route = useRoute()
-const courseId = route.params.courseId as string
 
+import { ref, watch } from 'vue'
+const route = useRoute()
 const db = useFirestore()
-const course = useDocument(doc(collection(db, 'courses'), courseId))
+const courseId = ref(route.params.courseId as string)
+const course = ref()
+
+function loadCourse(id: string) {
+  course.value = useDocument(doc(collection(db, 'courses'), id))
+}
+
+loadCourse(courseId.value)
+watch(() => route.params.courseId, (newId) => {
+  courseId.value = newId as string
+  loadCourse(courseId.value)
+})
 
 
 const pageTitle = 'Szczegóły kursu'

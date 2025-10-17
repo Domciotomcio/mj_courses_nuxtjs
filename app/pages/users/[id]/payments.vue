@@ -7,42 +7,61 @@ definePageMeta({
 const title = 'Płatności'
 const subtitle = 'Historia twoich płatności'
 
-const data = ref([
-  {
-    id: '4600',
-    data: '2024-03-11T15:30:00',
-    status: 'paid',
-    kwota: 594
-  },
-  {
-    id: '4599',
-    data: '2024-03-11T10:10:00',
-    status: 'failed',
-    email: 'mia.white@example.com',
-    kwota: 276
-  },
-  {
-    id: '4598',
-    data: '2024-03-11T08:50:00',
-    status: 'refunded',
-    kwota: 315
-  },
-  {
-    id: '4597',
-    data: '2024-03-10T19:45:00',
-    status: 'paid',
-    kwota: 529
-  },
-  {
-    id: '4596',
-    data: '2024-03-10T15:55:00',
-    status: 'paid',
-    kwota: 639
+
+import { useRoute } from 'vue-router'
+import { usePayments } from '../../../composables/use-payments'
+import { useFirestore, useCollection } from 'vuefire'
+import { collection, query, where, limit } from 'firebase/firestore'
+import { h, resolveComponent } from 'vue'
+import type { TableColumn } from '@nuxt/ui'
+
+const route = useRoute()
+
+const userUid = route.params.id as string
+const db = useFirestore()
+const userQuery = query(collection(db, 'users'), where('uid', '==', userUid), limit(1))
+const users = useCollection(userQuery)
+const userDocId = computed(() => users.value[0]?.id)
+
+import { computed } from 'vue'
+import type { Payment } from '../../../../types/models/payment'
+
+const paymentsData = computed(() => {
+  if (userDocId.value) {
+    return usePayments(userDocId.value)
   }
-])
+  return null
+})
+
+const paymentsRef = computed<Payment[]>(() => {
+  const data = paymentsData.value
+  if (data && Array.isArray(data.value)) {
+    return data.value as Payment[]
+  }
+  return []
+})
+
+const UBadge = resolveComponent('UBadge')
+
+const columns: TableColumn<any>[] = [
+  { accessorKey: 'id', header: 'ID', cell: ({ row }) => `#${row.getValue('id')}` },
+  { accessorKey: 'createdAt', header: 'Data', cell: ({ row }) => new Date(row.getValue('createdAt')).toLocaleString('pl-PL') },
+  { accessorKey: 'courseId', header: 'Kurs' },
+  { accessorKey: 'amount', header: 'Kwota', cell: ({ row }) => `${(Number(row.getValue('amount'))/100).toFixed(2)} zł` },
+  { accessorKey: 'currency', header: 'Waluta' },
+  { accessorKey: 'status', header: 'Status', cell: ({ row }) => {
+    const color = ({
+      succeeded: 'success',
+      pending: 'warning',
+      canceled: 'error',
+      failed: 'error'
+  })[String(row.getValue('status'))] || 'neutral'
+    return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => row.getValue('status'))
+  }}
+]
 </script>
 
 <template>
     <PageTitle :title="title" :subtitle="subtitle" />
-  <UTable :data="data" class="flex-1" />
+  <UTable :data="paymentsRef" :columns="columns" class="flex-1" />
 </template>

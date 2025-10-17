@@ -60,5 +60,26 @@ export default defineEventHandler(async (event) => {
      metadata: { courseId: course.id, userUid: userUid },
   })
 
+  // Add payment record to user's payments subcollection
+  if (userUid) {
+    const userRef = db.collection('users').where('uid', '==', userUid).limit(1)
+    const userSnap = await userRef.get()
+    if (!userSnap.empty) {
+      const userDoc = userSnap.docs[0]
+      const paymentData = {
+        id: session.id,
+        courseId: courseId,
+        amount: priceCents,
+        currency: 'pln',
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent || null
+      }
+      await userDoc.ref.collection('payments').doc(session.id).set(paymentData)
+    }
+  }
+
   return { url: session.url }
 });

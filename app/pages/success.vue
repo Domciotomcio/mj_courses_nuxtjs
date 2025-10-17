@@ -1,25 +1,19 @@
 <script lang="ts" setup>
-import { useRoute } from 'vue-router'
+import { useCurrentUser } from 'vuefire'
 
-const route = useRoute()
-const userId = route.params.userId
+const currentUser = useCurrentUser()
+const userId = computed(() => currentUser.value?.uid)
 </script>
 
 <template>
-    <div>
-        <div class="max-w-md mx-auto">
-            <u-card>
-                <template #header>
-                    <h2 class="text-lg font-bold">Płatność</h2>
-                </template>
-
-                <p class="text-green-700">Płatność zakończona sukcesem! Dziękujemy.</p>
-
-                <template #footer>
-                    <NuxtLink :to="`/users/${userId}/courses`">
-                        <UButton color="primary" variant="outline" class="w-full">Przejdź do swoich kursów</UButton>
-                    </NuxtLink>
-                </template>  </u-card>
-        </div>
-    </div>
+<div class="flex flex-col items-center justify-center py-4">
+  <UPricingPlan
+    title="Płatność zakończona!"
+    description="Dziękujemy za zakup kursu. Twoja płatność została pomyślnie przetworzona."
+    badge="Sukces"
+    :features="['Dostęp do kursu został przyznany', 'Potwierdzenie wysłane na e-mail', 'Możesz już korzystać z materiałów', 'W razie pytań skontaktuj się z nami']"
+    :button="{ label: 'Przejdź do swoich kursów', color: 'primary', variant: 'outline', block: true, to: `/users/${userId}/courses` }"
+    :ui="{ price: 'text-green-600 text-4xl', badge: 'bg-green-100 text-green-700', button: 'mt-6' }"
+  />
+</div>
 </template>

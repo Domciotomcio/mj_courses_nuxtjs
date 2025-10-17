@@ -39,10 +39,18 @@ watchEffect(() => {
       <div class="absolute right-4 top-0">
         <UButton
           :icon="isListView ? 'i-lucide-grid-2x2' : 'i-lucide-list'"
+          @click="toggleView"
+          color="neutral"
+          variant="outline"
+          class="lg:hidden"
+        />
+        <UButton
+          :icon="isListView ? 'i-lucide-grid-2x2' : 'i-lucide-list'"
           :label="isListView ? 'Widok siatki' : 'Widok listy'"
           @click="toggleView"
           color="neutral"
           variant="outline"
+          class="hidden lg:inline-flex"
         />
       </div>
     </div>

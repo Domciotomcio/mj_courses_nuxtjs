@@ -22,12 +22,6 @@ const profileForm = reactive({
   loading: false
 })
 
-// Email form state
-const emailForm = reactive({
-  newEmail: '',
-  password: '',
-  loading: false
-})
 
 // Password form state
 const passwordForm = reactive({
@@ -37,18 +31,12 @@ const passwordForm = reactive({
   loading: false
 })
 
-// Avatar form state
-const avatarForm = reactive({
-  avatarUrl: '',
-  loading: false
-})
 
 // Initialize form data when user data loads
 watchEffect(() => {
   if (dbUser.value) {
     profileForm.forename = dbUser.value.forename || ''
     profileForm.surname = dbUser.value.surname || ''
-    avatarForm.avatarUrl = dbUser.value.avatarUrl || ''
   }
 })
 
@@ -87,44 +75,6 @@ async function updateProfileInfo() {
   }
 }
 
-// Update email
-async function updateUserEmail() {
-  if (!user.value || !emailForm.newEmail) return
-  
-  emailForm.loading = true
-  try {
-    await updateEmail(user.value as FirebaseUser, emailForm.newEmail)
-    
-    // Update Firestore
-    if (dbUser.value?.id) {
-      const userRef = doc(db, 'users', dbUser.value.id)
-      await updateDoc(userRef, {
-        email: emailForm.newEmail,
-        updatedAt: new Date().toISOString()
-      })
-    }
-    
-    toast.add({ 
-      title: 'Sukces', 
-      description: 'Email został zaktualizowany',
-      color: 'success'
-    })
-    emailForm.newEmail = ''
-    emailForm.password = ''
-  } catch (error: any) {
-    let errorMessage = 'Nie udało się zaktualizować emaila'
-    if (error.code === 'auth/requires-recent-login') {
-      errorMessage = 'Zaloguj się ponownie, aby zmienić email'
-    }
-    toast.add({ 
-      title: 'Błąd', 
-      description: errorMessage,
-      color: 'error'
-    })
-  } finally {
-    emailForm.loading = false
-  }
-}
 
 // Update password
 async function updateUserPassword() {
@@ -175,39 +125,7 @@ async function updateUserPassword() {
   }
 }
 
-// Update avatar
-async function updateAvatar() {
-  if (!user.value || !dbUser.value) return
-  
-  avatarForm.loading = true
-  try {
-    // Update Firebase Auth photo URL
-    await updateProfile(user.value as FirebaseUser, {
-      photoURL: avatarForm.avatarUrl
-    })
-    
-    // Update Firestore
-    const userRef = doc(db, 'users', dbUser.value.id!)
-    await updateDoc(userRef, {
-      avatarUrl: avatarForm.avatarUrl,
-      updatedAt: new Date().toISOString()
-    })
-    
-    toast.add({ 
-      title: 'Sukces', 
-      description: 'Avatar został zaktualizowany',
-      color: 'success'
-    })
-  } catch (error: any) {
-    toast.add({ 
-      title: 'Błąd', 
-      description: error.message || 'Nie udało się zaktualizować avatara',
-      color: 'error'
-    })
-  } finally {
-    avatarForm.loading = false
-  }
-}
+
 </script>
 
 <template>
@@ -227,129 +145,41 @@ async function updateAvatar() {
           </div>
         </template>
 
-        <form @submit.prevent="updateProfileInfo" class="space-y-4">
-          <UFormGroup label="Imię" required>
-            <UInput 
-              v-model="profileForm.forename" 
-              placeholder="Wprowadź imię"
-              icon="i-lucide-user"
-              size="lg"
-            />
-          </UFormGroup>
+          <form @submit.prevent="updateProfileInfo" class="space-y-4">
+            <UFormField label="Imię" name="forename">
+              <UInput 
+                v-model="profileForm.forename" 
+                placeholder="Wprowadź imię"
+                icon="i-lucide-user"
+                size="lg"
+              />
+            </UFormField>
 
-          <UFormGroup label="Nazwisko" required>
-            <UInput 
-              v-model="profileForm.surname" 
-              placeholder="Wprowadź nazwisko"
-              icon="i-lucide-user"
-              size="lg"
-            />
-          </UFormGroup>
+            <UFormField label="Nazwisko" name="surname">
+              <UInput 
+                v-model="profileForm.surname" 
+                placeholder="Wprowadź nazwisko"
+                icon="i-lucide-user"
+                size="lg"
+              />
+            </UFormField>
 
-          <div class="flex justify-end">
-            <UButton 
-              type="submit" 
-              :loading="profileForm.loading"
-              icon="i-lucide-save"
-              size="lg"
-            >
-              Zapisz zmiany
-            </UButton>
-          </div>
-        </form>
+            <div class="flex justify-end">
+              <UButton 
+                type="submit" 
+                :loading="profileForm.loading"
+                icon="i-lucide-save"
+                size="lg"
+              >
+                Zapisz zmiany
+              </UButton>
+            </div>
+          </form>
       </UCard>
 
-      <!-- Avatar Card -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-image" class="w-5 h-5" />
-            <h2 class="text-xl font-semibold">Avatar</h2>
-          </div>
-        </template>
 
-        <form @submit.prevent="updateAvatar" class="space-y-4">
-          <UFormGroup label="URL avatara" helper="Wprowadź link do swojego zdjęcia profilowego">
-            <UInput 
-              v-model="avatarForm.avatarUrl" 
-              placeholder="https://example.com/avatar.jpg"
-              icon="i-lucide-link"
-              size="lg"
-            />
-          </UFormGroup>
 
-          <div v-if="avatarForm.avatarUrl" class="flex items-center gap-4">
-            <span class="text-sm text-gray-600 dark:text-gray-400">Podgląd:</span>
-            <img 
-              :src="avatarForm.avatarUrl" 
-              alt="Avatar preview" 
-              class="w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
-              @error="() => {}"
-            />
-          </div>
 
-          <div class="flex justify-end">
-            <UButton 
-              type="submit" 
-              :loading="avatarForm.loading"
-              icon="i-lucide-save"
-              size="lg"
-            >
-              Zaktualizuj avatar
-            </UButton>
-          </div>
-        </form>
-      </UCard>
-
-      <!-- Email Card -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-mail" class="w-5 h-5" />
-            <h2 class="text-xl font-semibold">Zmień email</h2>
-          </div>
-        </template>
-
-        <form @submit.prevent="updateUserEmail" class="space-y-4">
-          <UFormGroup label="Obecny email">
-            <UInput 
-              :model-value="user?.email || ''" 
-              disabled
-              icon="i-lucide-mail"
-              size="lg"
-            />
-          </UFormGroup>
-
-          <UFormGroup label="Nowy email" required>
-            <UInput 
-              v-model="emailForm.newEmail" 
-              type="email"
-              placeholder="nowy@email.com"
-              icon="i-lucide-mail"
-              size="lg"
-            />
-          </UFormGroup>
-
-          <UAlert
-            icon="i-lucide-info"
-            color="info"
-            variant="soft"
-            title="Informacja"
-            description="Po zmianie emaila możesz zostać poproszony o ponowne zalogowanie."
-          />
-
-          <div class="flex justify-end">
-            <UButton 
-              type="submit" 
-              :loading="emailForm.loading"
-              icon="i-lucide-save"
-              size="lg"
-            >
-              Zmień email
-            </UButton>
-          </div>
-        </form>
-      </UCard>
 
       <!-- Password Card -->
       <UCard>
@@ -361,7 +191,7 @@ async function updateAvatar() {
         </template>
 
         <form @submit.prevent="updateUserPassword" class="space-y-4">
-          <UFormGroup label="Nowe hasło" required>
+          <UFormField label="Nowe hasło" name="newPassword">
             <UInput 
               v-model="passwordForm.newPassword" 
               type="password"
@@ -369,9 +199,9 @@ async function updateAvatar() {
               icon="i-lucide-lock"
               size="lg"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Potwierdź nowe hasło" required>
+          <UFormField label="Potwierdź nowe hasło" name="confirmPassword">
             <UInput 
               v-model="passwordForm.confirmPassword" 
               type="password"
@@ -379,7 +209,7 @@ async function updateAvatar() {
               icon="i-lucide-lock"
               size="lg"
             />
-          </UFormGroup>
+          </UFormField>
 
           <UAlert
             icon="i-lucide-shield"

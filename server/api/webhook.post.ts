@@ -25,11 +25,14 @@ export default defineEventHandler(async (event) => {
   }
 
   // Handle checkout session completion
-  if (stripeEvent.type === 'checkout.session.completed') {
+  if (stripeEvent.type === 'checkout.session.completed' || stripeEvent.type === 'checkout.session.expired' || stripeEvent.type === 'checkout.session.async_payment_failed') {
     const session = stripeEvent.data.object as Stripe.Checkout.Session
     const courseId = session.metadata?.courseId
     const userUid = session.metadata?.userUid
-    console.log('✅ Payment succeeded for course:', courseId, 'session:', session.id)
+    const sessionId = session.id
+    let newStatus = 'pending'
+    if (stripeEvent.type === 'checkout.session.completed') newStatus = 'succeeded'
+    if (stripeEvent.type === 'checkout.session.expired' || stripeEvent.type === 'checkout.session.async_payment_failed') newStatus = 'canceled'
 
     if (!courseId || !userUid) {
       console.error('Missing courseId or userUid in session metadata')
@@ -39,7 +42,6 @@ export default defineEventHandler(async (event) => {
     try {
       // Use Firebase Admin SDK for server-side operations
       const { db } = useFirebaseAdmin()
-      
       // Query users collection to find the user by uid
       const usersSnapshot = await db.collection('users')
         .where('uid', '==', userUid)
@@ -53,30 +55,32 @@ export default defineEventHandler(async (event) => {
 
       // Get the user document
       const userDoc = usersSnapshot.docs[0]
-      const userData = userDoc.data()
-      
-      // Create Firestore document reference to the course
-      const courseDocRef = db.collection('courses').doc(courseId)
-      
-      // Add course reference to user's courses array (avoid duplicates)
-      const currentCourses = userData.courses || []
-      
-      // Check if course reference already exists by comparing paths
-      const courseRefExists = currentCourses.some((ref: any) => 
-        ref.path === courseDocRef.path || ref.id === courseId
-      )
-      
-      if (!courseRefExists) {
-        await userDoc.ref.update({
-          courses: [...currentCourses, courseDocRef]
-        })
-        console.log(`✅ Course reference ${courseDocRef.path} added to user ${userDoc.id}`)
-      } else {
-        console.log(`ℹ️  Course reference already exists for user ${userDoc.id}`)
+      // Update payment status in subcollection
+      const paymentRef = userDoc.ref.collection('payments').doc(sessionId)
+      await paymentRef.set({
+        status: newStatus,
+        updatedAt: new Date()
+      }, { merge: true })
+
+      // If payment succeeded, add course reference to user's courses array (avoid duplicates)
+      if (newStatus === 'succeeded') {
+        const userData = userDoc.data()
+        const courseDocRef = db.collection('courses').doc(courseId)
+        const currentCourses = userData.courses || []
+        const courseRefExists = currentCourses.some((ref: any) =>
+          ref.path === courseDocRef.path || ref.id === courseId
+        )
+        if (!courseRefExists) {
+          await userDoc.ref.update({
+            courses: [...currentCourses, courseDocRef]
+          })
+          console.log(`✅ Course reference ${courseDocRef.path} added to user ${userDoc.id}`)
+        } else {
+          console.log(`ℹ️  Course reference already exists for user ${userDoc.id}`)
+        }
       }
-      
     } catch (error) {
-      console.error('Error updating user courses:', error)
+      console.error('Error updating user payment/courses:', error)
       return { received: true, error: 'Failed to update user' }
     }
   }
