@@ -12,12 +12,7 @@ Spotkania odbywają się **na żywo**, ale po ich zakończeniu zyskujesz **doży
 Nie możesz być obecny? Nic nie szkodzi — obejrzysz wszystko w dogodnym dla siebie czasie na naszej platformie kursowej.
 ::
 
-::quote{}
-Przestrzeń i możliwości, które współtworzy Artur to miejsce dla duchowego rozwoju wielu młodych ludzi. Przez ostatnich kilka lat mogliśmy doświadczyć tego wspólnie z naszymi dziećmi. Wspaniale się patrzy na młodzież i dzieci w kościele, którzy pragną żyć w przyjaźni z Bogiem i innymi ludźmi.
-- Sylwia i Paweł, rodzice szóstki dzieci
-Coś tam coś tam coś tam
-- Dominik
-::
+<div class="not-prose h-8"></div>
 
 ### Dla kogo jest ten kurs?
 
@@ -26,6 +21,15 @@ Coś tam coś tam coś tam
 - szukają mądrego balansu między miłością a autorytetem
 - Dla wychowawców i katechetów, którzy chcą inspirować się perspektywą wiary w pracy z dziećmi i młodzieżą
 ::
+
+<div class="not-prose h-8"></div>
+
+### Opinie uczestników
+
+::quote{:quotes='[{"text":"Przestrzeń i możliwości, które współtworzy Artur to miejsce dla duchowego rozwoju wielu młodych ludzi. Przez ostatnich kilka lat mogliśmy doświadczyć tego wspólnie z naszymi dziećmi. Wspaniale się patrzy na młodzież i dzieci w kościele, którzy pragną żyć w przyjaźni z Bogiem i innymi ludźmi.","author":"Sylwia i Paweł, rodzice szóstki dzieci"},{"text":"Ten kurs całkowicie zmienił moje podejście do rodzicielstwa. Zrozumiałem, że wychowanie do wiary to nie tylko praktyki religijne, ale przede wszystkim relacja z Bogiem i prawdziwe świadectwo życia.","author":"Dominik, ojciec trójki dzieci"}]'}
+::
+
+<div class="not-prose h-8"></div>
 
 ### Prowadzący
 
@@ -36,6 +40,10 @@ Jest założycielem wspólnoty Kompania Jonatana, która obejmuje dzieci, młodz
 
 Wierzy, że wiara młodych jest darem, który dojrzewa w obecności dorosłych zdolnych kochać, słuchać i prowadzić z nadzieją.
 ::
+
+<div class="not-prose h-8"></div>
+
+### W zestawie z kursem otrzymujesz:
 
 ::features-grid{:features='[{"icon":"i-lucide-presentation","title":"Spotkania na żywo","description":"Interaktywne sesje z prowadzącym w czasie rzeczywistym","color":"blue"},{"icon":"i-lucide-video","title":"Materiały wideo","description":"Wysokiej jakości nagrania dostępne 24/7","color":"green"},{"icon":"i-lucide-book-open","title":"Książka w prezencie","description":"W pakiecie otrzymujesz dostęp elektroniczny do książki Mamo! Tato! Chcę do Kościoła!","color":"red"},{"icon":"i-lucide-infinity","title":"Dożywotni dostęp","description":"Wracaj do materiałów kiedy tylko chcesz","color":"purple"}]'}
 ::

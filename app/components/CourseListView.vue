@@ -1,6 +1,7 @@
 <script setup lang="ts">
 interface Props {
   courses?: any[]
+  userId?: string
 }
 
 const props = defineProps<Props>()
@@ -13,7 +14,7 @@ const props = defineProps<Props>()
       :key="course.id"
       class="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
     >
-      <NuxtLink :to="`/courses/${course.id}`" class="block">
+      <NuxtLink :to="userId ? `/users/${userId}/courses/${course.id}` : `/courses/${course.id}`" class="block">
         <div class="relative h-48 md:h-64 overflow-hidden">
           <!-- Background Image -->
           <img

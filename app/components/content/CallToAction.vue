@@ -7,7 +7,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   title: 'Gotowy, aby zacząć?',
-  description: 'Dołącz do kursu i rozpocznij naukę już dziś!',
+  description: '',
   icon: 'i-lucide-arrow-down'
 })
 </script>
@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
       </div>
       <UIcon 
         :name="icon" 
-        class="w-6 h-6 text-primary-600 dark:text-primary-400 animate-bounce" 
+        class="w-6 h-6 text-primary-600 dark:text-primary-400" 
       />
     </div>
   </div>

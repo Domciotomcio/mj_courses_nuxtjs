@@ -71,7 +71,7 @@ const displayFeatures = computed(() => props.features || defaultFeatures)
 </script>
 
 <template>
-  <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 not-prose max-w-full">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 not-prose max-w-full">
     <UCard v-for="(feature, index) in displayFeatures" :key="index" class="min-w-0">
       <div class="flex flex-col items-center text-center p-4">
         <div 

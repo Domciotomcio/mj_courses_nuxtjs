@@ -64,7 +64,7 @@ watchEffect(() => {
               v-for="course in user.courses"
               :key="course.id"
               v-bind="course"
-              :to="`/courses/${course.id}`"
+              :to="`/users/${userId}/courses/${course.id}`"
               :ui="{
                 description: 'mt-1 text-base text-pretty line-clamp-3'
               }"
@@ -74,7 +74,7 @@ watchEffect(() => {
 
         <!-- List View -->
         <div v-else class="container mx-auto px-4" key="list">
-          <CourseListView :courses="user.courses" />
+          <CourseListView :courses="user.courses" :userId="userId" />
         </div>
       </Transition>
     </div>

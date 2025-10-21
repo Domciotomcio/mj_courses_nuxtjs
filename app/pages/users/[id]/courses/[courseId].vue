@@ -1,84 +1,57 @@
 <script lang="ts" setup>
-import PageTitle from '~/components/PageTitle.vue';
-import { collection, doc } from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore'
 
 definePageMeta({
   middleware: 'auth'
 })
 
-
-import { ref, watch } from 'vue'
 const route = useRoute()
 const db = useFirestore()
-const courseId = ref(route.params.courseId as string)
-const course = ref()
+const courseId = route.params.courseId as string
+const userId = route.params.id as string
 
-function loadCourse(id: string) {
-  course.value = useDocument(doc(collection(db, 'courses'), id))
-}
+// Load course from Firestore
+const course = useDocument(doc(collection(db, 'courses'), courseId))
 
-loadCourse(courseId.value)
-watch(() => route.params.courseId, (newId) => {
-  courseId.value = newId as string
-  loadCourse(courseId.value)
-})
-
-
-const pageTitle = 'Szczegóły kursu'
-const pageSubtitle = 'Tutaj znajdziesz wszystkie informacje o kursie'
-
-const meetings = [
-  { id: 1, title: 'Spotkanie 1', label: 'Spotkanie 1', content: 'Content for meeting 1' },
-  { id: 2, title: 'Spotkanie 2', label: 'Spotkanie 2', content: 'Content for meeting 2' },
-  { id: 3, title: 'Spotkanie 3', label: 'Spotkanie 3', content: 'Content for meeting 3' }
-];
+// Load content based on course_markdown_name from user-courses folder
+const { data: courseContent } = await useAsyncData(
+  `user-course-content-${courseId}`,
+  async () => {
+    if (!course.value?.course_markdown_name) return null
+    return queryCollection('content')
+      .path(`/user-courses/${course.value.course_markdown_name}`)
+      .first()
+  },
+  {
+    watch: [course]
+  }
+)
 </script>
 
 <template>
   <div>
     <PageTitle :title="course?.title" :subtitle="course?.subtitle" />
 
-    <div class="container mx-auto px-4 py-8 prose dark:prose-invert max-w-none">
-      <p class="text-lg">
-        Cieszymy się, że chcesz wyruszyć z nami w tę drogę odkrywania, jak prowadzić dzieci ku dojrzałej i autentycznej wierze.
-      </p>
-      
-      <p>
-        To przestrzeń, w której możesz zatrzymać się, posłuchać, podzielić doświadczeniem i pozwolić, by Bóg działał w Twoim rodzicielstwie.
-      </p>
-
-      <p class="font-semibold">Poniżej znajdziesz:</p>
-      <ul>
-        <li>nagrania minionych spotkań,</li>
-        <li>terminy kolejnych sesji na żywo,</li>
-        <li>materiały dodatkowe.</li>
-      </ul>
-
-      <p>
-        Zachęcamy, byś uczestniczył w spotkaniach <strong>aktywnie</strong> – notuj swoje myśli, pytania, poruszenia serca. 
-        Możesz też wracać do nagrań w dowolnym momencie, w rytmie swojego życia rodzinnego.
-      </p>
-
-      <UAlert
-        color="primary"
-        variant="soft"
-        title="Niech ten kurs stanie się dla Ciebie przestrzenią spotkania z Bogiem, odnowienia wiary i odkrycia radości rodzicielstwa, które prowadzi do Niego."
-        class="my-6"
+    <div>
+      <ContentRenderer
+        v-if="courseContent"
+        :value="courseContent"
+        class="prose dark:prose-invert max-w-none"
       />
-
-      <UCard class="bg-primary-50 dark:bg-primary-950/20 border-l-4 border-primary-500">
-        <p class="italic text-base">
-          „Młody człowiek doświadczony miłością Bożą, powołaniem i misją, wsparty mądrością dorosłych, 
-          może wydobyć z siebie najpiękniejsze skarby Bożej łaski."
-        </p>
-      </UCard>
+      <div v-else class="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div class="flex flex-col items-center gap-4">
+          <UProgress size="xl" color="neutral" class="w-12 h-12" aria-hidden="true" />
+          <p class="sr-only">Ładowanie opisu kursu...</p>
+        </div>
+      </div>
     </div>
 
     <div class="mt-8"></div>
 
     <div>
-      <h1>Lista spotkań</h1>
-      <UAccordion type="multiple" :items="course?.meetings">
+      <h3>Lista spotkań</h3>
+
+      <CourseMeetings :meetings="course?.meetings">
         <template #content="{ item }">
           <template v-if="item!.has_occurred === false">
             
@@ -111,21 +84,22 @@ const meetings = [
 
           </template>
         </template>
-      </UAccordion>
+      </CourseMeetings>
     </div>
 
     <div class="mt-8"></div>
 
     <div>
-      <h1>Dodatkowe materiały</h1>
+      <h3>Dodatkowe materiały</h3>
       <div class="mt-4"></div>
-      <UCard>
-        <template #header>
-          <p>Książka</p>
-          </template>
-
-        
-      </UCard>
+      <BookDownload
+  bookTitle="Mamo! Tato! Chcę do Kościoła!"
+  bookDescription="Praktyczny przewodnik dla rodziców w wychowaniu dzieci do wiary"
+  bookCover="/books/Chce-do-kosciola_pomarancz.jpg"
+  downloadUrl="https://example.com/book.pdf"
+  fileFormat="PDF"
+  fileSize="3.2 MB"
+/>
     </div>
   </div>
 </template>

@@ -1,9 +1,24 @@
 <script setup lang="ts">
 import CourseMeetingItem from '~/components/CourseMeetingItem.vue'
 
-interface Meeting { id?: number | string; title?: string; label?: string; description?: string; content?: string; date?: string | number | Date | { seconds: number; nanoseconds: number } }
+interface Meeting { 
+  id?: number | string
+  title?: string
+  label?: string
+  description?: string
+  content?: string
+  date?: string | number | Date | { seconds: number; nanoseconds: number }
+  has_occurred?: boolean
+  meeting_url?: string
+  video_url?: string
+}
 
-const props = defineProps<{ meetings?: Meeting[] }>()
+const props = defineProps<{ 
+  meetings?: Meeting[]
+  userView?: boolean // New prop to determine if it's user view
+}>()
+
+const slots = useSlots()
 
 watchEffect(() => {
   console.log('Meetings prop changed:', props.meetings)
@@ -47,7 +62,10 @@ const getDateFromTimestamp = (date: any): Date | null => {
         </template>
         <template #content="{ item }">
           <div class="">
-            <CourseMeetingItem :item="item" />
+            <!-- Use custom slot content if provided (for user view), otherwise use default CourseMeetingItem -->
+            <slot name="content" :item="item">
+              <CourseMeetingItem :item="item" />
+            </slot>
           </div>
         </template>
       </UAccordion>
