@@ -9,7 +9,7 @@ const schema = z.object({
   forename: z.string().min(2, 'Imię musi mieć przynajmniej 2 znaki'),
   surname: z.string().optional(),
   email: z.string().email('Nieprawidłowy adres email'),
-  password: z.string().min(8, 'Hasło musi mieć przynajmniej 8 znaków'),
+  password: z.string().min(6, 'Hasło musi mieć przynajmniej 6 znaków'),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Hasła muszą być identyczne',
