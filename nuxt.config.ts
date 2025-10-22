@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   content: {
     experimental: { nativeSqlite: true }
   },
+  runtimeConfig: {
+    // Private keys only available server-side
+    firebaseServiceAccount: process.env.FIREBASE_SERVICE_ACCOUNT,
+    firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
+  },
   modules: [
     '@nuxt/eslint',
     '@nuxt/image',

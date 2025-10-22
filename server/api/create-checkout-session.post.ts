@@ -44,6 +44,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid course price' })
   }
 
+  // Get the correct base URL for redirects
+  const headers = getRequestHeaders(event)
+  const host = headers.host || 'localhost:3000'
+  const protocol = host.includes('localhost') ? 'http' : 'https'
+  const baseUrl = `${protocol}://${host}`
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card', 'p24'],
     line_items: [{
@@ -55,8 +61,8 @@ export default defineEventHandler(async (event) => {
       quantity: 1,
     }],
     mode: 'payment',
-    success_url: 'http://localhost:3000/success',
-    cancel_url: 'http://localhost:3000/cancel',
+    success_url: `${baseUrl}/success`,
+    cancel_url: `${baseUrl}/cancel`,
      metadata: { courseId: course.id, userUid: userUid },
   })
 
