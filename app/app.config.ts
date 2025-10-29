@@ -2,6 +2,7 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: 'orange',
+      neutral: 'stone', // Warm gray-brown that complements the ember theme
     },
     prose: {
       h1: {

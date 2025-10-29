@@ -21,6 +21,7 @@ const items: NavigationMenuItem[] = [
 </script>
 
 <template>
+  <USeparator class="h-px" />
   <UFooter>
     <template #default>
       <p class="text-muted text-sm">Misja Jonatan, Copyright © {{ new Date().getFullYear() }}</p>

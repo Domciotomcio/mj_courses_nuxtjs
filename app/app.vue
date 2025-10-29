@@ -10,8 +10,10 @@ import { pl } from '@nuxt/ui/locale'
 
 <template>
   <UApp :locale="pl">
+    <AppHeader />
     <NuxtLayout>
   </NuxtLayout>
+  <AppFooter />
   </UApp>
 </template>
 
@@ -25,4 +27,6 @@ import { pl } from '@nuxt/ui/locale'
   opacity: 0;
   filter: blur(1rem);
 }
+
+
 </style>

@@ -94,14 +94,16 @@ const featuresList = computed(() => {
         </div>
 
         <!-- Summary column -->
-        <div class="md:w-1/3 mt-8 md:mt-0">
+        <div class="md:w-1/3 mt-8 md:mt-0 relative">
+          <!-- Glowing gradient background -->
           <UPricingPlan
             :title="titleText"
             :description="descriptionText"
             :price="priceText"
             :features="featuresList"
             :button="{ label: 'Kup teraz', size: 'lg', block: true, onClick: () => buyCourse(course?.id || courseId) }"
-            class="mx-auto"
+            class="mx-auto bg-white/60 dark:bg-gray-900/60 backdrop-blur-md relative"
+            highlight
           />
         </div>
       </div>
