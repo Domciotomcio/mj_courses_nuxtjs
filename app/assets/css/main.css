@@ -3,6 +3,16 @@
 
 @source "../../../content/**/*";
 
+/* Set Comfortaa as the default font for body text */
+:root {
+  font-family: 'Comfortaa', system-ui, -apple-system, sans-serif;
+}
+
+/* Set Josefin Sans for all headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Josefin Sans', system-ui, -apple-system, sans-serif;
+}
+
 /* Global h3 styling (outside of .prose) */
 h3 {
   position: relative;

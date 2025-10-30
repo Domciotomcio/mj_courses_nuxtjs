@@ -25,12 +25,46 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             icon: 'i-lucide-user'
         })
     } catch (err: any) {
+        // Log Firebase error to console
+        console.error('Firebase login error:', err)
+        
+        // Map Firebase error codes to Polish messages
+        let polishMessage = 'Nie udało się zalogować. Sprawdź dane i spróbuj ponownie.'
+        
+        if (err?.code) {
+            switch (err.code) {
+                case 'auth/invalid-email':
+                    polishMessage = 'Podany adres email jest nieprawidłowy.'
+                    break
+                case 'auth/user-disabled':
+                    polishMessage = 'To konto zostało wyłączone.'
+                    break
+                case 'auth/user-not-found':
+                    polishMessage = 'Nie znaleziono użytkownika z tym adresem email.'
+                    break
+                case 'auth/wrong-password':
+                    polishMessage = 'Nieprawidłowe hasło.'
+                    break
+                case 'auth/invalid-credential':
+                    polishMessage = 'Nieprawidłowy email lub hasło.'
+                    break
+                case 'auth/too-many-requests':
+                    polishMessage = 'Zbyt wiele nieudanych prób logowania. Spróbuj ponownie później.'
+                    break
+                case 'auth/network-request-failed':
+                    polishMessage = 'Błąd połączenia sieciowego. Sprawdź swoje połączenie z internetem.'
+                    break
+                default:
+                    polishMessage = 'Nie udało się zalogować. Sprawdź dane i spróbuj ponownie.'
+            }
+        }
+        
         error.value = err
         toast.add({
             title: 'Błąd logowania',
-            description: err?.message || 'Nie udało się zalogować. Sprawdź dane i spróbuj ponownie.',
+            description: polishMessage,
             color: 'error',
-            icon: 'i-lucide-user'
+            icon: 'i-lucide-alert-circle'
         })
     } finally {
         loading.value = false

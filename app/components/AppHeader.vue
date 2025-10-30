@@ -77,7 +77,7 @@ function logout() {
 </script>
 
 <template>
-  <UHeader>
+  <UHeader to="https://misja-jonatan.pl" title="Misja Jonatan">
     <template #title>
       <UColorModeImage 
         light="/jonatan-logo.png" 

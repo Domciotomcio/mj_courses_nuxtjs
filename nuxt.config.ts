@@ -20,7 +20,18 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@unlok-co/nuxt-stripe',
     '@nuxt/content',
+    '@nuxt/fonts',
   ],
+  fonts: {
+    families: [
+      { name: 'Comfortaa', provider: 'google' },
+      { name: 'Josefin Sans', provider: 'google' }
+    ],
+    defaults: {
+      weights: [400, 700],
+      styles: ['normal'],
+    }
+  },
   colorMode: {
     preference: 'light', // default theme
     fallback: 'light',   // fallback theme if not stored
