@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 const auth = useFirebaseAuth()!
@@ -8,6 +8,9 @@ const toast = useToast()
 
 const error = ref(null)
 const loading = ref(false)
+const showReset = ref(false)
+const resetEmail = ref('')
+const resetEmailError = ref('')
 
 async function onSubmit(event: FormSubmitEvent<any>) {
     loading.value = true
@@ -52,25 +55,127 @@ const fields = [{
     type: 'checkbox' as const
 }]
 
+function validateEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+}
+
+async function handleForgotPasswordClick() {
+    // Prefill with email from login form if available
+    const inputEl = document.querySelector('input[name="email"]') as HTMLInputElement | null
+    const candidate = inputEl?.value?.trim() || ''
+    resetEmail.value = candidate
+    resetEmailError.value = ''
+    showReset.value = true
+}
+
+async function sendReset() {
+    const email = resetEmail.value?.trim()
+    
+    // Clear previous error
+    resetEmailError.value = ''
+    
+    if (!email) {
+        resetEmailError.value = 'Podaj adres email'
+        return
+    }
+    
+    if (!validateEmail(email)) {
+        resetEmailError.value = 'Podaj prawidłowy adres email'
+        return
+    }
+    
+    try {
+        await sendPasswordResetEmail(auth, email)
+        toast.add({
+            title: 'Wysłano link',
+            description: 'Sprawdź swoją skrzynkę pocztową, aby zresetować hasło.',
+            color: 'success',
+            icon: 'i-lucide-mail'
+        })
+        showReset.value = false
+        resetEmail.value = ''
+    } catch (err: any) {
+        toast.add({
+            title: 'Nie udało się wysłać',
+            description: err?.message || 'Wystąpił problem podczas wysyłania linku resetującego.',
+            color: 'error',
+            icon: 'i-lucide-x'
+        })
+    }
+}
+
 </script>
 
 <template>
     <div class="flex flex-col items-center justify-center gap-4 p-4">
-        <UPageCard class="w-full max-w-md">
-            <UAuthForm title="Zaloguj się"
-                description="Wprowadź dane logowania, aby uzyskać dostęp do swojego konta." icon="i-lucide-user"
-                :fields="fields" :submit="{
-                    label: 'Zaloguj się',
-                }" :loading="loading" @submit="onSubmit">
-                <template #footer>
-                    <div class="text-center text-sm text-muted">
-                        Nie masz jeszcze konta?
-                        <ULink to="/register" class="text-primary font-medium">
-                            Zarejestruj się
-                        </ULink>
-                    </div>
-                </template>
+        <UPageCard class="w-full max-w-md backdrop-blur-sm shadow-md">
+            <UAuthForm title="Zaloguj się" description="Wprowadź dane logowania, aby uzyskać dostęp do swojego konta."
+            icon="i-lucide-user" :fields="fields" :submit="{
+                label: 'Zaloguj się',
+            }" :loading="loading" @submit="onSubmit">
+            <template #footer>
+                <div class="flex flex-col gap-2 text-sm">
+                <div class="text-center">
+                    <!-- Reset Password Modal -->
+                    <UModal v-model:open="showReset" title="Reset hasła"
+                    description="Wpisz adres email powiązany z Twoim kontem. Wyślemy link do zresetowania hasła."
+                    :ui="{ footer: 'justify-end' }">
+                    <UButton color="neutral" size="xs" variant="link" @click="handleForgotPasswordClick">
+                        Nie pamiętasz hasła?
+                    </UButton>
+
+                    <template #body>
+                        <UFormField 
+                        label="Email" 
+                        :error="resetEmailError"
+                        required>
+                        <UInput 
+                            v-model="resetEmail" 
+                            type="email" 
+                            placeholder="Podaj swój adres email"
+                            icon="i-lucide-mail" 
+                            size="md"
+                            @blur="() => {
+                            if (resetEmail && !validateEmail(resetEmail)) {
+                                resetEmailError = 'Podaj prawidłowy adres email'
+                            } else {
+                                resetEmailError = ''
+                            }
+                            }"
+                            @input="() => resetEmailError = ''" />
+                        </UFormField>
+                    </template>
+
+                    <template #footer="{ close }">
+                        <div class="flex justify-end gap-2">
+                        <UButton 
+                            color="neutral" 
+                            variant="outline"
+                            @click="close">
+                            Anuluj
+                        </UButton>
+                        <UButton 
+                            color="primary"
+                            @click="sendReset">
+                            Wyślij link
+                        </UButton>
+                        </div>
+                    </template>
+
+                    </UModal>
+                </div>
+                <div class="text-center text-muted">
+                    Nie masz jeszcze konta?
+                    <ULink to="/register" class="text-primary font-medium">
+                    Zarejestruj się
+                    </ULink>
+                </div>
+                </div>
+            </template>
             </UAuthForm>
         </UPageCard>
+
+
     </div>
 </template>
