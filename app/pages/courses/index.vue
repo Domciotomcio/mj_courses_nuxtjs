@@ -29,19 +29,9 @@ const filteredCourses = computed(() => {
   <div>
     <!-- Header: centered PageTitle with a button pinned to the top-right -->
     <div class="relative mb-8">
-      <!-- Checkbox in top-left corner (desktop only) -->
-      <div class="absolute left-4 top-0 z-10 hidden sm:block">
-        <UCheckbox v-model="showFinishedCourses" label="Pokaż zakończone kursy" />
-      </div>
-
       <!-- Centered title container -->
       <div class="container mx-auto px-4 text-center">
         <page-title title="Wszystkie kursy" subtitle="Misja Jonatan - Kursy online" />
-        
-        <!-- Checkbox below title (mobile only) -->
-        <div class="mt-4 sm:hidden flex justify-center">
-          <UCheckbox v-model="showFinishedCourses" label="Pokaż zakończone kursy" />
-        </div>
       </div>
 
       <!-- Toggle button pinned to the top-right of the same header area -->
@@ -73,10 +63,13 @@ const filteredCourses = computed(() => {
             :key="course.id"
             v-bind="course"
             :to="course.is_finished ? undefined : `/courses/${course.id}`"
-            :class="{ 
-              'opacity-50 grayscale cursor-not-allowed': course.is_finished,
-              'cursor-pointer': !course.is_finished
-            }"
+            :class="[
+              'backdrop-blur-sm bg-default/60 shadow-xl hover:shadow-2xl ring-1 ring-black/10 rounded-lg transition-shadow',
+              {
+                'opacity-50 grayscale cursor-not-allowed pointer-events-none': course.is_finished,
+                'cursor-pointer': !course.is_finished
+              }
+            ]"
             :ui="{
               description: 'mt-1 text-base text-pretty line-clamp-3'
             }"
@@ -85,10 +78,15 @@ const filteredCourses = computed(() => {
       </div>
 
       <!-- List View -->
-      <div v-else class="container mx-auto px-4" key="list">
+      <div v-else class="container mx-auto" key="list">
         <CourseListView :courses="filteredCourses" />
       </div>
     </Transition>
+
+    <!-- Show finished courses checkbox at the bottom -->
+    <div class="container p-4 flex justify-center">
+      <UCheckbox v-model="showFinishedCourses" label="Pokaż zakończone kursy" />
+    </div>
   </div>
 </template>
 
