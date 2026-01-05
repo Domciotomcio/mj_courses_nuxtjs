@@ -65,14 +65,42 @@ const featuresList = computed(() => {
   return ['Dostęp do materiałów', 'Wsparcie autora', 'Certyfikat ukończenia']
 })
 
+const headlineText = computed(() => {
+  const courseDate = course.value?.date
+  if (!courseDate) return undefined
+  
+  // Handle Firebase Timestamp object
+  let startDate: Date
+  if (courseDate && typeof courseDate === 'object' && 'toDate' in courseDate) {
+    // Firebase Timestamp object
+    startDate = courseDate.toDate()
+  } else if (courseDate && typeof courseDate === 'object' && 'seconds' in courseDate) {
+    // Firebase Timestamp plain object { seconds, nanoseconds }
+    startDate = new Date(courseDate.seconds * 1000)
+  } else {
+    // Fallback to string/date parsing
+    startDate = new Date(courseDate)
+  }
+  
+  const now = new Date()
+  
+  // If course hasn't started yet, show the headline
+  if (startDate > now) {
+    return `Nowy - start od ${startDate.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+  }
+  
+  // Course already started, don't show headline
+  return undefined
+})
+
 </script>
 
 <template>
   <div>
     <UPageHero 
-      title="Jak wychować dzieci do wiary" 
+      :title="course?.title || 'Nazwa kursu'"
       description="Misja Jonatan - kursy online" 
-      headline="Nowy - start od 01.01.2025" 
+      :headline="headlineText"
       orientation="horizontal"
     >
       <img

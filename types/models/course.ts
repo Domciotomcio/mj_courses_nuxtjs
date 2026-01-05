@@ -31,6 +31,7 @@ export interface Course {
   currency?: string;
   isPublished?: boolean;
   is_finished?: boolean; // indicates if the course has ended
+  date?: string; // course start date
   createdAt?: string;
   updatedAt?: string;
   meetings?: Meeting[];
