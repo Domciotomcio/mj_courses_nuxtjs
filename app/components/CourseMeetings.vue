@@ -47,7 +47,7 @@ const getDateFromTimestamp = (date: any): Date | null => {
 </script>
 
 <template>
-  <UCard variant="outline" class="w-full bg-white/60 dark:bg-gray-900/60 backdrop-blur-md">
+  <UCard variant="outline" class="w-full bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-md hover:shadow-xl transition-shadow duration-300">
     <div class="p-0">
       <UAccordion type="multiple" :items="props.meetings">
         <template #default="{ item, index, open }">

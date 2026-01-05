@@ -4,5 +4,9 @@
       "type": "http",
       "url": "https://ui.nuxt.com/mcp"
     },
+    "nuxt": {
+      "type": "http",
+      "url": "https://nuxt.com/mcp"
+    }
   }
 }

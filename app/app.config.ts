@@ -4,6 +4,11 @@ export default defineAppConfig({
       primary: 'orange',
       neutral: 'stone', // Warm gray-brown that complements the ember theme
     },
+    pageHero: {
+      slots: {
+        container: 'flex flex-col lg:grid pt-8 pb-24 sm:pt-12 sm:pb-32 lg:pt-16 lg:pb-40 gap-16 sm:gap-y-24'
+      }
+    },
     prose: {
       h1: {
         slots: {

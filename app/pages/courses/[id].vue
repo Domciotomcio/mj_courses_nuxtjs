@@ -69,7 +69,17 @@ const featuresList = computed(() => {
 
 <template>
   <div>
-    <PageTitle :title="course?.title" :subtitle="course?.subtitle" />
+    <UPageHero 
+      title="Jak wychować dzieci do wiary" 
+      description="Misja Jonatan - kursy online" 
+      headline="Nowy - start od 01.01.2025" 
+      orientation="horizontal"
+    >
+      <img
+        :src="`/courses/jak_wychowac_dzieci_do_wiary/1x1.jpg`"
+        class="rounded-lg shadow-2xl ring ring-default"
+      />
+    </UPageHero>
 
     <div>
       <ContentRenderer

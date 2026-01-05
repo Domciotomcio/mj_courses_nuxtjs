@@ -2,7 +2,6 @@
 title: "Jak wychować dzieci do wiary?"
 ---
 
-::content-with-image{imageSrc="/courses/course1.jpg" imagePosition="right"}
 Kurs **„Jak wychować dzieci do wiary?"** został stworzony z myślą o rodzicach, którzy chcą pomagać swoim dzieciom **wzrastać w wierze** i **dojrzewać do prawdziwej relacji z Bogiem**. To przestrzeń, w której możesz **zatrzymać się nad swoim rodzicielstwem**, spojrzeć na nie w świetle Ewangelii i odkryć, że **wychowanie duchowe zaczyna się od przemiany serca rodzica**.
 
 Każde spotkanie to zaproszenie do refleksji, rozmowy i konkretnego działania — oparte na doświadczeniu, wierze i miłości. To 8 kroków prowadzących przez najważniejsze tematy rodzicielstwa: od odkrycia dziecka jako daru, przez budowanie autorytetu, po przekazywanie wiary w codzienności.
@@ -10,7 +9,6 @@ Każde spotkanie to zaproszenie do refleksji, rozmowy i konkretnego działania �
 Spotkania odbywają się **na żywo**, ale po ich zakończeniu zyskujesz **dożywotni dostęp do wszystkich nagrań i materiałów**.
 
 Nie możesz być obecny? Nic nie szkodzi — obejrzysz wszystko w dogodnym dla siebie czasie na naszej platformie kursowej.
-::
 
 <div class="not-prose h-8"></div>
 

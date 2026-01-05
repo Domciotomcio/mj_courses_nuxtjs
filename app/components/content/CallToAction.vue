@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="mt-8 p-6 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950 dark:to-primary-900 rounded-2xl">
+  <div class="mt-8 p-6 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950 dark:to-primary-900 rounded-2xl shadow-lg border border-primary-200 dark:border-primary-800">
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>
         <h4 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">

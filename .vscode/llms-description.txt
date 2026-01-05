@@ -1,0 +1,3 @@
+What files are in LLMs.txt:
+- Nuxt documentation
+- NuxtUI documentation

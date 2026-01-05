@@ -35,7 +35,7 @@ const contentSizeClasses = {
           <img 
             :src="imageSrc" 
             :alt="imageAlt || 'Content image'" 
-            class="w-full rounded-2xl shadow-xl object-cover aspect-square hover:shadow-2xl transition-shadow duration-300"
+            class="w-full rounded-2xl shadow-xl object-cover hover:shadow-xl transition-shadow duration-300"
           />
         </div>
       </div>
