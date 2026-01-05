@@ -28,6 +28,7 @@ Dla kogo jest ten kurs?
 
 ### Prowadzący
 
+::content-with-image{imageSrc="/artur.jpg" imagePosition="left" imageSize="small"}
 **dr Artur Skowron** – teolog, ewangelizator, szczęśliwy mąż Beatki. Od ponad dwudziestu lat zaangażowany w formację młodzieży i rodzin. Spotkanie z Bogiem w 1999 roku odmieniło jego życie – odkrył, że Bóg naprawdę chce mówić do człowieka, i podjął misję, by pomagać innym Go słyszeć.
  
 W ramach Misji Jonatan prowadzi projekty ewangelizacyjne, rekolekcje, warsztaty i wspólnoty, inspirując młodych do życia w przyjaźni z Bogiem i dojrzałości duchowej. Jego serce szczególnie bije dla tych, którzy chcą nauczyć się wsłuchiwać w głos Boży w codzienności.
@@ -39,6 +40,7 @@ Działając we wspólnotach formacyjnych, łączy głębokie doświadczenie duch
 
 Gotowy, by usłyszeć, co Bóg chce Ci powiedzieć?
 Dołącz do kursu i naucz się rozpoznawać Jego głos w codzienności.
+::
 
 ::features-grid{:features='[{"icon":"i-lucide-presentation","title":"Spotkania na żywo","description":"Interaktywne sesje z prowadzącym w czasie rzeczywistym","color":"blue"},{"icon":"i-lucide-video","title":"Materiały wideo","description":"Wysokiej jakości nagrania dostępne 24/7","color":"green"},{"icon":"i-lucide-book-open","title":"Książka w prezencie","description":"W pakiecie otrzymujesz dostęp elektroniczny do książki „Mów, proszę, wyraźnie!”","color":"red"},{"icon":"i-lucide-infinity","title":"Dożywotni dostęp","description":"Wracaj do materiałów kiedy tylko chcesz","color":"purple"}]'}
 ::

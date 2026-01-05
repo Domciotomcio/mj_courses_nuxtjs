@@ -72,7 +72,7 @@ const displayFeatures = computed(() => props.features || defaultFeatures)
 
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 not-prose max-w-full">
-    <UCard v-for="(feature, index) in displayFeatures" :key="index" class="min-w-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md">
+    <UCard v-for="(feature, index) in displayFeatures" :key="index" class="min-w-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-md hover:shadow-xl transition-shadow duration-300">
       <div class="flex flex-col items-center text-center p-4">
         <div 
           class="w-16 h-16 rounded-full flex items-center justify-center mb-4"

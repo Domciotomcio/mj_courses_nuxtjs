@@ -21,8 +21,6 @@ const filteredCourses = computed(() => {
   }
   return courses.value.filter(course => !course.is_finished)
 })
-
-
 </script>
 
 <template>
@@ -61,7 +59,7 @@ const filteredCourses = computed(() => {
           <UBlogPost
             v-for="course in filteredCourses"
             :key="course.id"
-            v-bind="course"
+            v-bind="{ ...course, date: convertToDate(course.date) }"
             :to="course.is_finished ? undefined : `/courses/${course.id}`"
             :class="[
               'backdrop-blur-sm bg-default/60 shadow-xl hover:shadow-2xl ring-1 ring-black/10 rounded-lg transition-shadow',

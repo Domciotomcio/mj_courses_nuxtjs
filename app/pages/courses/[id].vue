@@ -93,21 +93,29 @@ const headlineText = computed(() => {
   return undefined
 })
 
+const scrollToPurchase = () => {
+  const pricingPlan = document.querySelector('.pricing-section')
+  if (pricingPlan) {
+    pricingPlan.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
 </script>
 
 <template>
   <div>
-    <UPageHero 
+    <UPageSection
       :title="course?.title || 'Nazwa kursu'"
       description="Misja Jonatan - kursy online" 
       :headline="headlineText"
       orientation="horizontal"
+      :links="[{ label: 'Kup teraz', size: 'xl', icon: 'i-lucide-shopping-basket', onClick: scrollToPurchase }]"
     >
       <img
-        :src="`/courses/jak_wychowac_dzieci_do_wiary/1x1.jpg`"
-        class="rounded-lg shadow-2xl ring ring-default"
+        :src="course?.image_1x1"
+        class="rounded-lg shadow-2xl ring ring-default aspect-[4/3] object-cover"
       />
-    </UPageHero>
+    </UPageSection>
 
     <div>
       <ContentRenderer
@@ -132,14 +140,14 @@ const headlineText = computed(() => {
         </div>
 
         <!-- Summary column -->
-        <div class="md:w-1/3 mt-8 md:mt-0">
+        <div class="md:w-1/3 mt-8 md:mt-0 pricing-section">
           <UPricingPlan
             :title="titleText"
             :description="descriptionText"
             :price="priceText"
             :features="featuresList"
             :button="{ label: 'Kup teraz', size: 'lg', block: true, onClick: () => buyCourse(course?.id || courseId) }"
-            class="mx-auto bg-white/60 dark:bg-gray-900/60 backdrop-blur-md"
+            class="mx-auto bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-md hover:shadow-xl transition-shadow duration-300"
           />
         </div>
       </div>

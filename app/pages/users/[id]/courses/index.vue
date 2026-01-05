@@ -63,8 +63,9 @@ watchEffect(() => {
             <UBlogPost
               v-for="course in user.courses"
               :key="course.id"
-              v-bind="course"
+              v-bind="{ ...course, date: convertToDate(course.date) }"
               :to="`/users/${userId}/courses/${course.id}`"
+              class="backdrop-blur-sm bg-default/60 shadow-xl hover:shadow-2xl ring-1 ring-black/10 rounded-lg transition-shadow cursor-pointer"
               :ui="{
                 description: 'mt-1 text-base text-pretty line-clamp-3'
               }"

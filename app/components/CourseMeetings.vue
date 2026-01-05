@@ -44,14 +44,34 @@ const getDateFromTimestamp = (date: any): Date | null => {
   return null
 }
 
+// Check if meeting can be expanded (has occurred or has no date)
+const canExpandMeeting = (meeting: Meeting): boolean => {
+  // If no date, cannot expand
+  if (!meeting.date) return false
+  
+  const meetingDate = getDateFromTimestamp(meeting.date)
+  if (!meetingDate) return false
+  
+  // Check if meeting has occurred (date is in the past)
+  return meetingDate <= new Date()
+}
+
+// Process meetings to add disabled state
+const processedMeetings = computed(() => {
+  return props.meetings?.map(meeting => ({
+    ...meeting,
+    disabled: !canExpandMeeting(meeting)
+  }))
+})
+
 </script>
 
 <template>
   <UCard variant="outline" class="w-full bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-md hover:shadow-xl transition-shadow duration-300">
     <div class="p-0">
-      <UAccordion type="multiple" :items="props.meetings">
+      <UAccordion type="multiple" :items="processedMeetings">
         <template #default="{ item, index, open }">
-          <div class="flex items-center justify-between w-full">
+          <div class="flex items-center justify-between w-full" :class="{ 'opacity-50': item.disabled }">
             <div class="flex-1 min-w-0 text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
               {{ item?.label || item?.title || `Spotkanie ${index + 1}` }}
             </div>

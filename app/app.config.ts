@@ -9,6 +9,11 @@ export default defineAppConfig({
         container: 'flex flex-col lg:grid pt-8 pb-24 sm:pt-12 sm:pb-32 lg:pt-16 lg:pb-40 gap-16 sm:gap-y-24'
       }
     },
+    pageSection: {
+      slots: {
+        container: 'flex flex-col lg:grid pt-8 pb-16 sm:pt-12 sm:pb-24 lg:pt-16 lg:pb-32 gap-8 sm:gap-16'
+      }
+    },
     prose: {
       h1: {
         slots: {

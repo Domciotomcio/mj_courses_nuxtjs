@@ -26,6 +26,58 @@ const { data: courseContent } = await useAsyncData(
     watch: [course]
   }
 )
+
+// Convert Firestore timestamp to Date
+const getDateFromTimestamp = (date: any): Date | null => {
+  if (!date) return null
+  if (date instanceof Date) return date
+  if (date.seconds !== undefined) {
+    return new Date(date.seconds * 1000)
+  }
+  if (typeof date === 'number') {
+    return new Date(date)
+  }
+  if (typeof date === 'string') {
+    return new Date(date)
+  }
+  return null
+}
+
+// Find the next upcoming meeting
+const nextMeeting = computed(() => {
+  if (!course.value?.meetings || !course.value?.meeting_url) return null
+  
+  const now = new Date()
+  const upcomingMeetings = course.value.meetings
+    .filter(meeting => {
+      const meetingDate = getDateFromTimestamp(meeting.date)
+      return meetingDate && meetingDate > now
+    })
+    .sort((a, b) => {
+      const dateA = getDateFromTimestamp(a.date)
+      const dateB = getDateFromTimestamp(b.date)
+      return (dateA?.getTime() || 0) - (dateB?.getTime() || 0)
+    })
+  
+  return upcomingMeetings[0] || null
+})
+
+// Debug
+watchEffect(() => {
+  console.log('Course meetings:', course.value?.meetings)
+  console.log('Course meeting_url:', course.value?.meeting_url)
+  console.log('Next meeting:', nextMeeting.value)
+  if (course.value?.meetings) {
+    course.value.meetings.forEach((meeting, index) => {
+      const meetingDate = getDateFromTimestamp(meeting.date)
+      console.log(`Meeting ${index}:`, {
+        date: meeting.date,
+        parsedDate: meetingDate,
+        isInFuture: meetingDate ? meetingDate > new Date() : false
+      })
+    })
+  }
+})
 </script>
 
 <template>
@@ -48,6 +100,13 @@ const { data: courseContent } = await useAsyncData(
 
     <div class="mt-8"></div>
 
+    <!-- Next Meeting Section -->
+    <NextMeetingSection 
+      v-if="nextMeeting && course?.meeting_url" 
+      :meeting="nextMeeting" 
+      :meetingUrl="course.meeting_url" 
+    />
+
     <div>
       <h3>Lista spotkań</h3>
 
@@ -62,7 +121,7 @@ const { data: courseContent } = await useAsyncData(
                 <p>{{ item?.description }}</p>
               </div>
               <div class="flex-shrink-0 pb-3.5">
-                <UButton :href="item!.meeting_url" target="_blank">
+                <UButton :href="course?.meeting_url" target="_blank">
                   <UIcon name="i-lucide-presentation" />
                   Dołącz do spotkania
                 </UButton>
@@ -92,14 +151,18 @@ const { data: courseContent } = await useAsyncData(
     <div>
       <h3>Dodatkowe materiały</h3>
       <div class="mt-4"></div>
+      <!--Course book name-->
+      <h1>{{ course?.book?.name }}</h1>
+
       <BookDownload
-  bookTitle="Mamo! Tato! Chcę do Kościoła!"
-  bookDescription="Praktyczny przewodnik dla rodziców w wychowaniu dzieci do wiary"
-  bookCover="/books/Chce-do-kosciola_pomarancz.jpg"
-  downloadUrl="https://example.com/book.pdf"
-  fileFormat="PDF"
-  fileSize="3.2 MB"
-/>
+        v-if="course?.book?.name"
+        :bookTitle="course?.book?.name"
+        :bookDescription="course?.book?.description"
+        :bookCover="course?.book?.cover_image"
+        :downloadUrl="`/books/${course.book.pdf_name}`"
+        :fileFormat="course?.book?.file_format"
+        :fileSize="course?.book?.file_size"
+      />
     </div>
   </div>
 </template>
