@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
+import NoCourseFound from '~/components/courses/NoCourseFound.vue'
 
 definePageMeta({
   middleware: 'auth'
@@ -59,7 +60,7 @@ watchEffect(() => {
       <!-- Grid View -->
       <Transition name="fade" mode="out-in">
         <div v-if="!isListView" key="grid">
-          <UBlogPosts v-if="user.courses">
+          <UBlogPosts v-if="user.courses && user.courses.length > 0">
             <UBlogPost
               v-for="course in user.courses"
               :key="course.id"
@@ -71,11 +72,26 @@ watchEffect(() => {
               }"
             />
           </UBlogPosts>
+           <div v-else>
+            <NoCourseFound />
+          </div>
         </div>
 
         <!-- List View -->
         <div v-else class="container mx-auto px-4" key="list">
-          <CourseListView :courses="user.courses" :userId="userId" />
+          <CourseListView v-if="user.courses && user.courses.length > 0" :courses="user.courses" :userId="userId" />
+          <UEmpty
+            v-else
+            icon="i-lucide-graduation-cap"
+            title="Brak zapisanych kursów"
+            description="Nie masz jeszcze żadnych kursów. Sprawdź dostępne kursy i rozpocznij naukę!"
+            :actions="[{
+              label: 'Przeglądaj kursy',
+              icon: 'i-lucide-search',
+              color: 'primary',
+              to: '/courses'
+            }]"
+          />
         </div>
       </Transition>
     </div>

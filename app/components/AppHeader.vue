@@ -87,7 +87,12 @@ function logout() {
       />
     </template>
 
-    <UNavigationMenu :items="navigationMenuItems" />
+    <UNavigationMenu 
+      :items="navigationMenuItems" 
+      :ui="{
+        link: 'data-[active=true]:!text-primary data-[active=true]:before:!bg-primary/10 data-[active=true]:!font-semibold'
+      }"
+    />
 
     <template #right>
       <div class="flex items-center gap-2">

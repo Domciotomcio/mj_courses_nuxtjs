@@ -4,6 +4,11 @@ export default defineAppConfig({
       primary: 'orange',
       neutral: 'stone', // Warm gray-brown that complements the ember theme
     },
+    pageCTA: {
+      slots: {
+        root: 'relative isolate rounded-xl overflow-hidden backdrop-blur-sm bg-white/70 dark:bg-gray-900/70'
+      }
+    },
     pageHero: {
       slots: {
         container: 'flex flex-col lg:grid pt-8 pb-24 sm:pt-12 sm:pb-32 lg:pt-16 lg:pb-40 gap-16 sm:gap-y-24'

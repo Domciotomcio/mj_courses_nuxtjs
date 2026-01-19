@@ -46,6 +46,9 @@ const getDateFromTimestamp = (date: any): Date | null => {
 
 // Check if meeting can be expanded (has occurred or has no date)
 const canExpandMeeting = (meeting: Meeting): boolean => {
+  // TODO: REMOVE LATER !!!!
+  return true
+
   // If no date, cannot expand
   if (!meeting.date) return false
   
@@ -71,7 +74,7 @@ const processedMeetings = computed(() => {
     <div class="p-0">
       <UAccordion type="multiple" :items="processedMeetings">
         <template #default="{ item, index, open }">
-          <div class="flex items-center justify-between w-full" :class="{ 'opacity-50': item.disabled }">
+          <div class="flex space-between w-full" :class="{ 'opacity-50': item.disabled }">
             <div class="flex-1 min-w-0 text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
               {{ item?.label || item?.title || `Spotkanie ${index + 1}` }}
             </div>

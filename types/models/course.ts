@@ -22,9 +22,11 @@ export interface Course {
   slug?: string; // url-friendly identifier
   // image file name placed under /public/courses
   image_name?: string;
+  image_1x1?: string; // square image variant
   // camelCase alternative for consumers that prefer it
   imageName?: string;
   description?: string;
+  author?: string; // course author/instructor name
   instructorId?: ID;
   lessons?: Lesson[]; // embedded lessons; in other setups this might be IDs
   price?: number;
