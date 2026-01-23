@@ -4,9 +4,9 @@
 
 Niniejszy Regulamin określa zasady korzystania z serwisu internetowego dostępnego pod adresem www.kursy.kompaniajonatana.pl, w tym zasady zakładania konta, zakupu dostępu do kursów oraz tryb postępowania reklamacyjnego.
 
-Właścicielem serwisu i Administratorem jest Fundacja [NAZWA] z siedzibą w [MIEJSCOWOŚĆ, ADRES], wpisana do Krajowego Rejestru Sądowego pod numerem KRS: [NUMER], NIP: [NUMER], REGON: [NUMER] (dalej zwana: „Fundacją” lub „Usługodawcą”).
+Właścicielem serwisu i Administratorem jest Fundacja Charyzmatykon z siedzibą w Kiełczówku, Szafranowa 7, wpisana do Krajowego Rejestru Sądowego pod numerem KRS: [NUMER], NIP: [NUMER], REGON: [NUMER] (dalej zwana: „Fundacją” lub „Usługodawcą”).
 
-Kontakt z Fundacją możliwy jest drogą elektroniczną pod adresem: [ADRES EMAIL].
+Kontakt z Fundacją możliwy jest drogą elektroniczną pod adresem: charyzmatykon@gmail.com.
 
 § 2. Wymagania techniczne
 

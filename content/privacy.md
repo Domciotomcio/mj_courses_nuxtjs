@@ -6,7 +6,7 @@ title: Polityka Prywatności
 
 § 1. Administrator Danych
 
-Administratorem danych osobowych jest Fundacja [PEŁNA NAZWA FUNDACJI] z siedzibą w [MIEJSCOWOŚĆ, ULICA], wpisana do Rejestru Stowarzyszeń (...) Krajowego Rejestru Sądowego pod numerem KRS: [NUMER KRS], NIP: [NUMER NIP].
+Administratorem danych osobowych jest Fundacja **Charyzmatykon** z siedzibą w Kiełczówku, Szafranowa 7 wpisana do Rejestru Stowarzyszeń Krajowego Rejestru Sądowego pod numerem KRS: [NUMER KRS], NIP: [NUMER NIP].
 
 Kontakt z Administratorem w sprawach ochrony danych osobowych jest możliwy pod adresem e-mail: [ADRES EMAIL].
 
