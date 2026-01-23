@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useFirestore, useDocument } from 'vuefire'
+import { useFirestore, useDocument, useCollection } from 'vuefire'
 import { collection, doc } from 'firebase/firestore'
 import { useRoute } from 'vue-router'
 import CourseMeetingItem from '~/components/CourseMeetingItem.vue'
@@ -7,12 +7,51 @@ import CourseMeetings from '~/components/CourseMeetings.vue'
 import { computed } from 'vue'
 
 const route = useRoute()
+const router = useRouter()
 const courseId = route.params.id as string
 const user = useCurrentUser()
-const userUid = user.value?.uid
+const consentAccepted = ref(false)
+const toast = useToast()
+
+// Reactive userUid
+const userUid = computed(() => user.value?.uid)
+
+// Load user document with courses field (array of references)
+const db = useFirestore()
+const userDoc = computed(() => {
+  if (!userUid.value) return null
+  return useDocument(doc(db, 'users', userUid.value))
+})
+
+// Check if user already owns this course
+const userOwnsCourse = computed(() => {
+  if (!user.value?.uid) return false
+  if (!userDoc.value?.value) return false
+  
+  const userCourses = userDoc.value.value.courses
+  if (!Array.isArray(userCourses)) return false
+  
+  // Check if any of the course references match the current courseId
+  const hasCourse = userCourses.some((courseRef: any) => {
+    // Extract the course ID from the reference path
+    // Path format: /courses/{courseId}
+    if (courseRef?.path) {
+      const refCourseId = courseRef.path.split('/').pop()
+      return refCourseId === courseId
+    }
+    // Or if it's just the ID
+    if (courseRef?.id === courseId) return true
+    return false
+  })
+  
+  console.log('User courses array:', userCourses)
+  console.log('Looking for courseId:', courseId)
+  console.log('User owns course:', hasCourse)
+  
+  return hasCourse
+})
 
 console.log('Course ID from route:', courseId)
-const db = useFirestore()
 const course = useDocument(doc(collection(db, 'courses'), courseId))
 console.log(course)
 
@@ -31,10 +70,29 @@ const { data: courseContent } = await useAsyncData(
 )
 
 async function buyCourse(courseId: string) {
+  // Check if user is logged in
+  if (!user.value) {
+    router.push({
+      path: '/login',
+      query: { redirect: `/courses/${courseId}` }
+    })
+    return
+  }
+
+  if (!consentAccepted.value) {
+    toast.add({
+      title: 'Wymagana zgoda',
+      description: 'Musisz zaakceptować warunki dostarczenia treści cyfrowych, aby kontynuować zakup.',
+      color: 'error',
+      icon: 'i-lucide-alert-circle'
+    })
+    return
+  }
+  
   console.log('courseId:', courseId)
   const { url } = await $fetch('/api/create-checkout-session', {
     method: 'POST',
-    body: { courseId, userUid }
+    body: { courseId, userUid: userUid.value }
   })
 
   if (url) window.location.href = url
@@ -159,9 +217,53 @@ onMounted(() => {
             :description="descriptionText"
             :price="priceText"
             :features="featuresList"
-            :button="{ label: 'Kup teraz', size: 'lg', block: true, onClick: () => buyCourse(course?.id || courseId) }"
             class="mx-auto bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-md hover:shadow-xl transition-shadow duration-300"
-          />
+          >
+            <template #footer>
+              <div v-if="!user" class="space-y-4">
+                <UAlert
+                  title="Wymagane logowanie"
+                  description="Musisz być zalogowany, aby kupić kurs."
+                  color="warning"
+                  icon="i-lucide-info"
+                />
+                <UButton
+                  label="Zaloguj się"
+                  size="lg"
+                  block
+                  @click="router.push({ path: '/login', query: { redirect: `/courses/${courseId}` } })"
+                />
+              </div>
+              <div v-else-if="userOwnsCourse" class="space-y-4">
+                <UAlert
+                  title="Masz już ten kurs"
+                  description="Ten kurs jest już dostępny w Twoim koncie."
+                  color="success"
+                  icon="i-lucide-check-circle"
+                />
+                <UButton
+                  label="Przejdź do kursu"
+                  size="lg"
+                  block
+                  @click="router.push(`/users/${userUid}/courses/${courseId}`)"
+                />
+              </div>
+              <div v-else class="space-y-4">
+                <UFormField>
+                  <UCheckbox 
+                    v-model="consentAccepted"
+                    label="Wyrażam zgodę na dostarczenie treści cyfrowych (kursu) natychmiast po opłaceniu zamówienia i przyjmuję do wiadomości, że w ten sposób tracę prawo do odstąpienia od umowy w terminie 14 dni."
+                  />
+                </UFormField>
+                <UButton
+                  label="Kup teraz"
+                  size="lg"
+                  block
+                  @click="buyCourse(course?.id || courseId)"
+                />
+              </div>
+            </template>
+          </UPricingPlan>
         </div>
       </div>
     </div>

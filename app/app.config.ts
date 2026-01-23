@@ -11,6 +11,15 @@ export default defineAppConfig({
         }
       }
     },
+    card: {
+      variants: {
+        variant: {
+          soft: {
+            root: 'bg-transparent dark:bg-elevated/50 divide-y divide-default'
+          }
+        }
+      }
+    },
     pageCTA: {
       slots: {
         root: 'light:bg-white/70 dark:bg-[#110907]/70 relative isolate rounded-xl overflow-hidden backdrop-blur-lg',

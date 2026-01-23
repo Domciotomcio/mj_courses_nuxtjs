@@ -21,6 +21,7 @@ export default defineNuxtConfig({
     '@unlok-co/nuxt-stripe',
     '@nuxt/content',
     '@nuxt/fonts',
+    '@nuxtjs/mdc',
   ],
   fonts: {
     families: [

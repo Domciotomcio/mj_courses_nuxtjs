@@ -9,16 +9,15 @@ const columns: FooterColumn[] = [
     label: 'Nawigacja',
     children: [
       { label: 'Wszystkie kursy', to: '/courses' },
-      { label: 'Moje kursy', to: '/users/me/courses' },
-      { label: 'Kontakt', to: '/contact' }
+      { label: 'Moje kursy', to: '/users/me/courses' }
     ]
   },
   {
     label: 'Wsparcie',
     children: [
-      { label: 'FAQ', to: '/faq' },
+      { label: 'Kontakt', to: '/contact' },
       { label: 'Polityka prywatności', to: '/privacy' },
-      { label: 'Regulamin', to: '/terms' }
+      { label: 'Regulamin', to: '/statute' }
     ]
   }
 ]
@@ -40,9 +39,13 @@ const columns: FooterColumn[] = [
             />
             <div>
               <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Kontakt</p>
-              <a :href="`tel:${phoneNumber.replace(/\s/g, '')}`" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition">
+              <a :href="`tel:${phoneNumber.replace(/\s/g, '')}`" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition mb-2">
                 <UIcon name="i-lucide-phone" class="w-4 h-4" />
                 <span>{{ phoneNumber }}</span>
+              </a>
+              <a href="mailto:charyzmatykon@gmail.com" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition">
+                <UIcon name="i-lucide-mail" class="w-4 h-4" />
+                <span>charyzmatykon@gmail.com</span>
               </a>
             </div>
           </div>
