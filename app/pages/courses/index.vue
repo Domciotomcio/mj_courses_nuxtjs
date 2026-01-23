@@ -33,7 +33,14 @@ const sortOptions = [
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId)
   if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const headerOffset = 80 // Adjust this value based on your header height
+    const elementPosition = element.getBoundingClientRect().top
+    const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    })
   }
 }
 
@@ -105,18 +112,19 @@ const filteredCourses = computed(() => {
 <template>
   <div>
     <!-- Header -->
-    <section>
+    <section class="container mx-auto px-6 my-12">
     <UPageHero
       headline="Misja Jonatan"
       title="Odkryj kursy online Misji Jonatan"
       description="Misja Jonatan - kursy online, które pomogą Ci wzrastać w wierze i pogłębiać relację z Bogiem."
       orientation="horizontal"
+      
       :links="[{
         label: 'Zobacz kursy',
         color: 'primary',
         size: 'lg',
         trailingIcon: 'i-lucide-arrow-down',
-        click: () => scrollToSection('courses-section')
+        onClick: () => scrollToSection('courses-section')
       }]"
     >
     <img
@@ -146,20 +154,22 @@ const filteredCourses = computed(() => {
           v-model="searchQuery"
           icon="i-lucide-search"
           placeholder="Szukaj kursów..."
-          class="w-full"
+          class="w-full mr-6"
           size="lg"
+          variant="subtle"
           />
         </div>
         
         <!-- Filters Row -->
-        <div class="flex flex-wrap gap-4 items-center">
+        <div class="flex flex-wrap gap-3 items-center">
           <div class="flex items-center gap-2">
           <UPopover>
             <UButton
             color="neutral"
-            variant="outline"
+            variant="ghost"
             icon="i-lucide-calendar"
-            size="sm"
+            size="md"
+            highlight="true"
             >
             {{ dateFrom ? df.format(dateFrom.toDate(getLocalTimeZone())) : 'Data od' }}
             </UButton>
@@ -168,14 +178,14 @@ const filteredCourses = computed(() => {
             </template>
           </UPopover>
           
-          <span class="text-muted">-</span>
+          <span class="text-muted text-sm">-</span>
           
           <UPopover>
             <UButton
             color="neutral"
-            variant="outline"
+            variant="ghost"
             icon="i-lucide-calendar"
-            size="sm"
+            size="md"
             >
             {{ dateTo ? df.format(dateTo.toDate(getLocalTimeZone())) : 'Data do' }}
             </UButton>
@@ -192,19 +202,21 @@ const filteredCourses = computed(() => {
           icon="i-lucide-arrow-up-down"
           trailing-icon="i-lucide-chevron-down"
           color="neutral"
-          variant="outline"
-          size="sm"
-          class="w-auto"
+          variant="ghost"
+          size="md"
+          class="w-auto min-w-[200px]"
           />
           
-          <UCheckbox v-model="showFinishedCourses" label="Pokaż zakończone kursy" />
+          <div class="flex items-center">
+            <UCheckbox v-model="showFinishedCourses" label="Pokaż zakończone kursy" />
+          </div>
           
           <UButton
           v-if="searchQuery || dateFrom || dateTo || showFinishedCourses"
           icon="i-lucide-x"
           color="neutral"
           variant="ghost"
-          size="sm"
+          size="md"
           @click="() => {
             searchQuery = ''
             dateFrom = null
@@ -231,7 +243,7 @@ const filteredCourses = computed(() => {
       :links="course.is_finished ? [] : [{
         icon: 'i-lucide-shopping-cart',
         label: 'Zakup kurs',
-        to: `/courses/${course.id}`,
+        to: `/courses/${course.id}#summary`,
         color: 'neutral',
         variant: 'outline'
       },{

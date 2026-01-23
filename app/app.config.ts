@@ -2,11 +2,18 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: 'orange',
-      neutral: 'stone', // Warm gray-brown that complements the ember theme
+      neutral: 'stone',
+    },
+    input: {
+      variants: {
+        variant: {
+          subtle: 'text-highlighted bg-white/40 dark:bg-black/50 ring ring-inset ring-accented'
+        }
+      }
     },
     pageCTA: {
       slots: {
-        root: 'light:bg-white/50 dark:bg-black/50 relative isolate rounded-xl overflow-hidden backdrop-blur-lg',
+        root: 'light:bg-white/70 dark:bg-[#110907]/70 relative isolate rounded-xl overflow-hidden backdrop-blur-lg',
       }
     },
     pageHero: {

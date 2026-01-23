@@ -100,6 +100,18 @@ const scrollToPurchase = () => {
   }
 }
 
+// Handle hash navigation on mount
+onMounted(() => {
+  if (route.hash) {
+    setTimeout(() => {
+      const element = document.querySelector(route.hash)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 300) // Small delay to ensure content is rendered
+  }
+})
+
 </script>
 
 <template>
@@ -132,6 +144,7 @@ const scrollToPurchase = () => {
       </div>
     </div>
 
+    <section id="summary">
     <div class="container mt-8">
       <div class="flex flex-col md:flex-row md:items-start md:gap-8">
         <!-- Meetings column -->
@@ -152,5 +165,6 @@ const scrollToPurchase = () => {
         </div>
       </div>
     </div>
+    </section>
   </div>
 </template>
