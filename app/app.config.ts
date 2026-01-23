@@ -6,7 +6,7 @@ export default defineAppConfig({
     },
     pageCTA: {
       slots: {
-        root: 'relative isolate rounded-xl overflow-hidden backdrop-blur-sm bg-white/70 dark:bg-gray-900/70'
+        root: 'light:bg-white/50 dark:bg-black/50 relative isolate rounded-xl overflow-hidden backdrop-blur-lg',
       }
     },
     pageHero: {
