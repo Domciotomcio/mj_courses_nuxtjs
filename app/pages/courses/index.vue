@@ -174,7 +174,7 @@ const filteredCourses = computed(() => {
             {{ dateFrom ? df.format(dateFrom.toDate(getLocalTimeZone())) : 'Data od' }}
             </UButton>
             <template #content>
-            <UCalendar v-model="dateFrom as any" class="p-2" />
+            <UCalendar v-model="dateFrom" class="p-2" />
             </template>
           </UPopover>
           
@@ -190,7 +190,7 @@ const filteredCourses = computed(() => {
             {{ dateTo ? df.format(dateTo.toDate(getLocalTimeZone())) : 'Data do' }}
             </UButton>
             <template #content>
-            <UCalendar v-model="dateTo as any" class="p-2" />
+            <UCalendar v-model="dateTo" class="p-2" />
             </template>
           </UPopover>
           </div>
