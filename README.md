@@ -73,3 +73,13 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+
+# Stripe
+This project uses Stripe for payment processing. Make sure to set up your Stripe account and configure the necessary API keys in your environment variables.
+Refer to the [Stripe documentation](https://stripe.com/docs) for guidance on integrating Stripe with your Nuxt application.
+
+How to run locally with Stripe:
+```bash
+stripe listen --forward-to localhost:3000/api/webhook
+```

@@ -30,9 +30,12 @@ export default defineEventHandler(async (event) => {
     const courseId = session.metadata?.courseId
     const userUid = session.metadata?.userUid
     const sessionId = session.id
-    let newStatus = 'pending'
-    if (stripeEvent.type === 'checkout.session.completed') newStatus = 'succeeded'
-    if (stripeEvent.type === 'checkout.session.expired' || stripeEvent.type === 'checkout.session.async_payment_failed') newStatus = 'canceled'
+    
+    // Map Stripe event types to payment statuses
+    let paymentStatus: 'paid' | 'expired' | 'failed' | 'pending' = 'pending'
+    if (stripeEvent.type === 'checkout.session.completed') paymentStatus = 'paid'
+    if (stripeEvent.type === 'checkout.session.expired') paymentStatus = 'expired'
+    if (stripeEvent.type === 'checkout.session.async_payment_failed') paymentStatus = 'failed'
 
     if (!courseId || !userUid) {
       console.error('Missing courseId or userUid in session metadata')
@@ -42,6 +45,7 @@ export default defineEventHandler(async (event) => {
     try {
       // Use Firebase Admin SDK for server-side operations
       const { db } = useFirebaseAdmin()
+      
       // Query users collection to find the user by uid
       const usersSnapshot = await db.collection('users')
         .where('uid', '==', userUid)
@@ -55,15 +59,45 @@ export default defineEventHandler(async (event) => {
 
       // Get the user document
       const userDoc = usersSnapshot.docs[0]
-      // Update payment status in subcollection
-      const paymentRef = userDoc.ref.collection('payments').doc(sessionId)
-      await paymentRef.set({
-        status: newStatus,
-        updatedAt: new Date()
-      }, { merge: true })
+      
+      // Check if there's an existing pending payment for this user+course combination
+      const existingPaymentsSnapshot = await userDoc.ref.collection('payments')
+        .where('courseId', '==', courseId)
+        .where('paymentStatus', 'in', ['pending', 'expired', 'failed'])
+        .get()
+      
+      // Prepare payment data
+      const paymentData = {
+        stripeSessionId: sessionId,
+        userUid,
+        courseId,
+        amountTotal: session.amount_total || 0,
+        currency: session.currency || 'pln',
+        customerEmail: session.customer_details?.email || session.customer_email || '',
+        paymentStatus,
+        updatedAt: new Date(),
+        stripePaymentIntentId: session.payment_intent as string | undefined
+      }
+      
+      // If there's an existing pending payment, update it instead of creating new one
+      if (!existingPaymentsSnapshot.empty && paymentStatus === 'paid') {
+        const existingPaymentDoc = existingPaymentsSnapshot.docs[0]
+        await existingPaymentDoc.ref.update({
+          ...paymentData,
+          createdAt: existingPaymentDoc.data().createdAt // Preserve original creation date
+        })
+        console.log(`✅ Updated existing payment ${existingPaymentDoc.id} to ${paymentStatus} (new session: ${sessionId})`)
+      } else {
+        // Create new payment record with sessionId as document ID
+        await userDoc.ref.collection('payments').doc(sessionId).set({
+          ...paymentData,
+          createdAt: new Date()
+        }, { merge: true })
+        console.log(`✅ Payment record created: ${sessionId} with status: ${paymentStatus}`)
+      }
 
       // If payment succeeded, add course reference to user's courses array (avoid duplicates)
-      if (newStatus === 'succeeded') {
+      if (paymentStatus === 'paid') {
         const userData = userDoc.data()
         const courseDocRef = db.collection('courses').doc(courseId)
         const currentCourses = userData.courses || []
