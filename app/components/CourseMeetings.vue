@@ -76,7 +76,8 @@ const processedMeetings = computed(() => {
         <template #default="{ item, index, open }">
           <div class="flex space-between w-full" :class="{ 'opacity-50': item.disabled }">
             <div class="flex-1 min-w-0 text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
-              {{ item?.label || item?.title || `Spotkanie ${index + 1}` }}
+              Spotkanie {{ index + 1 }} - {{ item?.label || 'Brak etykiety' }}
+              
             </div>
             <div v-if="item?.date && getDateFromTimestamp(item.date)" class="flex-none ml-4 text-sm text-muted">
               <NuxtTime :datetime="getDateFromTimestamp(item.date)!" locale="pl" day="numeric" month="short" year="numeric" hour="numeric" minute="numeric" />

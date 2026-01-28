@@ -278,7 +278,7 @@ const filteredCourses = computed(() => {
       <!-- Number of meetings -->
       <div class="flex items-center gap-1">
         <UIcon name="i-lucide-presentation" class="w-5 h-5" />
-        <span>12 spotkań na żywo</span>
+        <span>8 spotkań na żywo</span>
       </div>
 
       <!-- Number of meetings -->
@@ -290,7 +290,7 @@ const filteredCourses = computed(() => {
       <!-- Number of meetings -->
       <div class="flex items-center gap-1">
         <UIcon name="i-lucide-book-open" class="w-5 h-5" />
-        <span>Ksiąka w prezencie</span>
+        <span>Książka w prezencie</span>
       </div>
 
       <!-- Number of meetings -->
@@ -303,7 +303,7 @@ const filteredCourses = computed(() => {
       <!-- Price Section -->
       <!--
       <div class="flex items-baseline gap-2">
-      <span class="text-3xl font-bold text-gray-900 dark:text-white">199 zł</span>
+      <span class="text-3xl font-bold text-gray-900 dark:text-white">320 zł</span>
       <div v-if="course.is_cutprized">
       <span class="text-sm text-gray-400 line-through">299 zł</span> <UBadge color="orange" variant="subtle" size="xs">Promocja</UBadge>
       </div>

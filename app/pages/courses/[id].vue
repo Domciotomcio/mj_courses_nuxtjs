@@ -126,7 +126,7 @@ const priceText = computed(() => {
 const featuresList = computed(() => {
   const f = course.value?.features
   if (Array.isArray(f) && f.length) return f
-  return ['Dostęp do materiałów', 'Wsparcie autora', 'Certyfikat ukończenia']
+  return ['Lista funkcji pojawi się niebawem.']
 })
 
 const headlineText = computed(() => {
