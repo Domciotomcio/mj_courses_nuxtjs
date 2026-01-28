@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import type { FooterColumn } from '@nuxt/ui'
 
-const phoneNumber = '+48 123 456 789'
+const phoneNumber = '+48 507 011 408'
 
 const columns: FooterColumn[] = [
   {

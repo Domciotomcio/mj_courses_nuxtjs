@@ -1,16 +1,49 @@
 <script setup lang="ts">
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 const auth = useFirebaseAuth()!
+const db = useFirestore()
 const user = useCurrentUser()
 const toast = useToast()
 
 const error = ref(null)
 const loading = ref(false)
+const googleLoading = ref(false)
 const showReset = ref(false)
 const resetEmail = ref('')
 const resetEmailError = ref('')
+const providers = computed(() => [{
+    label: 'Zaloguj z Google',
+    icon: 'i-simple-icons-google',
+    color: 'neutral',
+    variant: 'outline',
+    block: true,
+    loading: googleLoading.value,
+    onClick: signInWithGoogle
+}])
+
+async function ensureUserDocument(user: any) {
+    if (!user?.uid || !db) return
+
+    const userRef = doc(db, 'users', user.uid)
+    const existing = await getDoc(userRef)
+
+    if (!existing.exists()) {
+        const [forename = '', ...rest] = (user.displayName || '').split(' ')
+        const surname = rest.join(' ')
+
+        await setDoc(userRef, {
+            uid: user.uid,
+            email: user.email || '',
+            forename,
+            surname,
+            courses: [],
+            createdAt: new Date()
+        })
+    }
+}
 
 async function onSubmit(event: FormSubmitEvent<any>) {
     loading.value = true
@@ -71,17 +104,51 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     }
 }
 
+async function signInWithGoogle() {
+    googleLoading.value = true
+    const provider = new GoogleAuthProvider()
+
+    try {
+        const result = await signInWithPopup(auth, provider)
+        await ensureUserDocument(result.user)
+
+        navigateTo('/courses')
+        toast.add({
+            title: 'Sukces',
+            description: 'Zalogowano za pomocą Google',
+            color: 'success',
+            icon: 'i-lucide-user-check'
+        })
+    } catch (err: any) {
+        console.error('Google login error:', err)
+
+        const isPopupClosed = err?.code === 'auth/popup-closed-by-user'
+        const description = isPopupClosed
+            ? 'Zamknięto okno logowania Google.'
+            : 'Nie udało się zalogować przez Google. Spróbuj ponownie.'
+
+        toast.add({
+            title: 'Błąd logowania',
+            description,
+            color: 'error',
+            icon: 'i-lucide-alert-circle'
+        })
+    } finally {
+        googleLoading.value = false
+    }
+}
+
 const fields = [{
     name: 'email',
     type: 'email' as const,
     label: 'Email',
-    placeholder: '`Podaj swój email`',
+    placeholder: 'Adres email',
     required: true
 }, {
     name: 'password',
     label: 'Hasło',
     type: 'password' as const,
-    placeholder: '`Podaj swoje hasło`',
+    placeholder: 'Hasło',
     required: true
 }, {
     name: 'remember',
@@ -101,6 +168,8 @@ async function handleForgotPasswordClick() {
     resetEmail.value = candidate
     resetEmailError.value = ''
     showReset.value = true
+
+    sendReset()
 }
 
 async function sendReset() {
@@ -145,7 +214,7 @@ async function sendReset() {
     <div class="flex flex-col items-center justify-center gap-4 p-4">
         <UPageCard class="w-full max-w-md backdrop-blur-sm shadow-md">
             <UAuthForm title="Zaloguj się" description="Wprowadź dane logowania, aby uzyskać dostęp do swojego konta."
-            icon="i-lucide-user" :fields="fields" :submit="{
+            icon="i-lucide-user" :fields="fields" :providers="providers" :submit="{
                 label: 'Zaloguj się',
             }" :loading="loading" @submit="onSubmit">
             <template #footer>

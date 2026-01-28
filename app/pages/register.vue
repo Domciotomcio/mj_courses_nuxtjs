@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { doc, setDoc } from 'firebase/firestore'
+import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 
 // Validation schema
 const schema = z.object({
@@ -69,13 +69,44 @@ const fields = [
 
 // Loading state
 const loading = ref(false)
+const googleLoading = ref(false)
 const error = ref<string | null>(null)
+const providers = computed(() => [{
+  label: 'Kontynuuj z Google',
+  icon: 'i-simple-icons-google',
+  color: 'neutral',
+  variant: 'outline',
+  block: true,
+  loading: googleLoading.value,
+  onClick: signInWithGoogle
+}])
 
 // Firebase composables
 const auth = useFirebaseAuth()
 const db = useFirestore()
 const router = useRouter()
 const toast = useToast()
+
+async function ensureUserDocument(user: any) {
+  if (!user?.uid || !db) return
+
+  const userRef = doc(db, 'users', user.uid)
+  const existing = await getDoc(userRef)
+
+  if (!existing.exists()) {
+    const [forename = '', ...rest] = (user.displayName || '').split(' ')
+    const surname = rest.join(' ')
+
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email || '',
+      forename,
+      surname,
+      courses: [],
+      createdAt: new Date()
+    })
+  }
+}
 
 // Submit handler
 async function onSubmit(event: FormSubmitEvent<Schema>) {
@@ -138,6 +169,44 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     loading.value = false
   }
 }
+
+async function signInWithGoogle() {
+  if (!auth) {
+    error.value = 'Błąd inicjalizacji Firebase'
+    return
+  }
+
+  googleLoading.value = true
+  const provider = new GoogleAuthProvider()
+
+  try {
+    const result = await signInWithPopup(auth, provider)
+    await ensureUserDocument(result.user)
+
+    toast.add({
+      title: 'Sukces',
+      description: 'Zalogowano przez Google',
+      color: 'success'
+    })
+
+    router.push('/courses')
+  } catch (err: any) {
+    console.error('Google registration error:', err)
+
+    const isPopupClosed = err?.code === 'auth/popup-closed-by-user'
+    error.value = isPopupClosed
+      ? 'Okno logowania zostało zamknięte.'
+      : 'Nie udało się zalogować przez Google. Spróbuj ponownie.'
+
+    toast.add({
+      title: 'Błąd',
+      description: error.value,
+      color: 'error'
+    })
+  } finally {
+    googleLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -146,6 +215,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       <UAuthForm
         :schema="schema"
         :fields="fields"
+        :providers="providers"
         :loading="loading"
         title="Utwórz konto"
         description="Zarejestruj się, aby uzyskać dostęp do kursów"
