@@ -145,8 +145,6 @@ watchEffect(() => {
     <div>
       <h3>Dodatkowe materiały</h3>
       <div class="mt-4"></div>
-      <!--Course book name-->
-      <h1>{{ course?.book?.name }}</h1>
 
       <BookDownload
         v-if="course?.book?.name"
@@ -156,6 +154,7 @@ watchEffect(() => {
         :downloadUrl="`/books/${course.book.pdf_name}`"
         :fileFormat="course?.book?.file_format"
         :fileSize="course?.book?.file_size"
+        :is_finished="course?.is_finished"
       />
     </div>
   </div>

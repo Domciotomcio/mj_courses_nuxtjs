@@ -223,7 +223,7 @@ onMounted(() => {
             :description="descriptionText"
             :price="priceText"
             :features="featuresList"
-            class="mx-auto bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-md hover:shadow-xl transition-shadow duration-300"
+            variant="soft"
           >
             <template #footer>
               <div v-if="!user" class="space-y-4">

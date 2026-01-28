@@ -24,7 +24,9 @@ const columns: FooterColumn[] = [
 </script>
 
 <template>
-  <USeparator color="neutral" size="sm" />
+  <USeparator
+    class="border-gray-200 dark:border-white/40 opacity-90"
+  />
   <UFooter>
     <template #top>
       <UContainer>

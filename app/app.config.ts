@@ -1,3 +1,5 @@
+const DARK_BG = '#110907'
+
 export default defineAppConfig({
   ui: {
     colors: {
@@ -15,14 +17,14 @@ export default defineAppConfig({
       variants: {
         variant: {
           soft: {
-            root: 'bg-transparent dark:bg-elevated/50 divide-y divide-default'
+            root: 'light:bg-white/70 dark:bg-[${DARK_BG}]/70 backdrop-blur-lg shadow-md hover:shadow-xl transition-shadow duration-300'
           }
         }
       }
     },
     pageCTA: {
       slots: {
-        root: 'light:bg-white/70 dark:bg-[#110907]/70 relative isolate rounded-xl overflow-hidden backdrop-blur-lg',
+        root: `light:bg-white/70 dark:bg-[${DARK_BG}]/70 relative isolate rounded-xl overflow-hidden backdrop-blur-lg`,
       }
     },
     pageHero: {
@@ -33,6 +35,11 @@ export default defineAppConfig({
     pageSection: {
       slots: {
         container: 'flex flex-col lg:grid pt-8 pb-16 sm:pt-12 sm:pb-24 lg:pt-16 lg:pb-32 gap-8 sm:gap-16'
+      }
+    },
+    pricingPlan: {
+      slots: {
+        root: 'light:bg-white/70 dark:bg-[${DARK_BG}]/70 backdrop-blur-lg shadow-md hover:shadow-xl transition-shadow duration-300'
       }
     },
     prose: {
