@@ -74,8 +74,8 @@ const error = ref<string | null>(null)
 const providers = computed(() => [{
   label: 'Kontynuuj z Google',
   icon: 'i-simple-icons-google',
-  color: 'neutral',
-  variant: 'outline',
+  color: 'neutral' as const,
+  variant: 'outline' as const,
   block: true,
   loading: googleLoading.value,
   onClick: signInWithGoogle

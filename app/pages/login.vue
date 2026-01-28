@@ -17,8 +17,8 @@ const resetEmailError = ref('')
 const providers = computed(() => [{
     label: 'Zaloguj z Google',
     icon: 'i-simple-icons-google',
-    color: 'neutral',
-    variant: 'outline',
+    color: 'neutral' as const,
+    variant: 'outline' as const,
     block: true,
     loading: googleLoading.value,
     onClick: signInWithGoogle
