@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { addDoc, collection, doc, limit, orderBy, query, Timestamp, updateDoc } from 'firebase/firestore'
 import { useCollection, useFirestore } from 'vuefire'
-import type { Course } from '~/types/models'
+import type { Course, Meeting } from '~/types/models'
 
 // Restrict to authenticated users. Extend later with role checks if available.
 definePageMeta({
@@ -115,18 +115,22 @@ const meetingsQuery = computed(() => {
   return query(collection(db, 'courses', selectedCourseId.value, 'meetings'), orderBy('index', 'asc'))
 })
 
+type MeetingDoc = Meeting & {
+  id: string
+  date?: any
+}
+
 interface MeetingFormState {
   id?: string
   label: string
   description: string
   index: number | null
   dateInput: string
-  meeting_url: string
   video_url: string
   has_occurred: boolean
 }
 
-const meetings = useCollection<any>(meetingsQuery)
+const meetings = useCollection<MeetingDoc>(meetingsQuery)
 const selectedMeetingId = ref<string | null>(null)
 const meetingForm = reactive<MeetingFormState>({
   id: undefined,
@@ -134,7 +138,6 @@ const meetingForm = reactive<MeetingFormState>({
   description: '',
   index: null,
   dateInput: '',
-  meeting_url: '',
   video_url: '',
   has_occurred: false
 })
@@ -146,7 +149,6 @@ const resetMeetingForm = () => {
   meetingForm.description = ''
   meetingForm.index = meetings.value?.length ? meetings.value.length + 1 : 1
   meetingForm.dateInput = ''
-  meetingForm.meeting_url = ''
   meetingForm.video_url = ''
   meetingForm.has_occurred = false
 }
@@ -161,14 +163,13 @@ watch(meetings, value => {
   }
 })
 
-const selectMeeting = (meeting: any) => {
+const selectMeeting = (meeting: MeetingDoc) => {
   selectedMeetingId.value = meeting.id
   meetingForm.id = meeting.id
   meetingForm.label = meeting.label || ''
   meetingForm.description = meeting.description || ''
   meetingForm.index = typeof meeting.index === 'number' ? meeting.index : Number(meeting.index) || 1
-  meetingForm.dateInput = toDateInputValue(meeting.date)
-  meetingForm.meeting_url = meeting.meeting_url || ''
+  meetingForm.dateInput = toDateInputValue((meeting as any).date ?? meeting.timestamp)
   meetingForm.video_url = meeting.video_url || ''
   meetingForm.has_occurred = Boolean(meeting.has_occurred)
 }
@@ -181,7 +182,6 @@ const saveMeeting = async () => {
       label: meetingForm.label,
       description: meetingForm.description,
       index: Number(meetingForm.index) || 0,
-      meeting_url: meetingForm.meeting_url,
       video_url: meetingForm.video_url,
       has_occurred: meetingForm.has_occurred
     }
@@ -257,69 +257,40 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
           </template>
 
           <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <UFormGroup>
-                <UFormField label="Tytuł">
-              <UInput v-model="courseForm.title" placeholder="Tytuł kursu" size="lg" class="w-full"/>
-                </UFormField>
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Podtytuł</span>
-              </template>
+            <UFormField label="Tytuł">
+              <UInput v-model="courseForm.title" placeholder="Tytuł kursu" size="lg" class="w-full" />
+            </UFormField>
+            <UFormField label="Podtytuł">
               <UInput v-model="courseForm.subtitle" placeholder="Krótki podtytuł" size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup class="md:col-span-2">
-              <template #label>
-                <span class="text-xs font-medium text-muted">Opis</span>
-              </template>
+            </UFormField>
+            <UFormField label="Opis" class="md:col-span-2">
               <UTextarea v-model="courseForm.description" :rows="4" placeholder="Opis kursu" class="text-base w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Cena (PLN)</span>
-              </template>
+            </UFormField>
+            <UFormField label="Cena (PLN)">
               <UInput v-model.number="courseForm.price" type="number" min="0" step="1" placeholder="199" size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Nazwa pliku markdown</span>
-              </template>
+            </UFormField>
+            <UFormField label="Nazwa pliku markdown">
               <UInput v-model="courseForm.course_markdown_name" placeholder="np. kurs-wiara" size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Adres obrazka okładki</span>
-              </template>
+            </UFormField>
+            <UFormField label="Adres obrazka okładki">
               <UInput v-model="courseForm.image_1x1" placeholder="/courses/example.jpg" size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Domyślny link do spotkań</span>
-              </template>
+            </UFormField>
+            <UFormField label="Domyślny link do spotkań">
               <UInput v-model="courseForm.meeting_url" placeholder="https://zoom.us/..." size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Data startu</span>
-              </template>
+            </UFormField>
+            <UFormField label="Data startu">
               <UInput v-model="courseForm.dateInput" type="datetime-local" size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Status</span>
-              </template>
+            </UFormField>
+            <UFormField label="Status">
               <UCheckbox
                 v-model="courseForm.is_finished"
                 label="Kurs zakończony"
                 size="lg"
               />
-            </UFormGroup>
-            <UFormGroup class="md:col-span-2">
-              <template #label>
-                <span class="text-xs font-medium text-muted">Funkcje (po jednej na linię)</span>
-              </template>
+            </UFormField>
+            <UFormField label="Funkcje (po jednej na linię)" class="md:col-span-2">
               <UTextarea v-model="courseForm.featuresText" :rows="5" placeholder="Cecha 1\nCecha 2" class="text-base w-full" />
-            </UFormGroup>
+            </UFormField>
           </div>
         </UCard>
 
@@ -338,52 +309,28 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
           </template>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Nazwa</span>
-              </template>
-              <UInput v-model="meetingForm.label" placeholder="Tytuł spotkania" size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Kolejność</span>
-              </template>
+            <UFormField label="Kolejność">
               <UInput v-model.number="meetingForm.index" type="number" min="1" step="1" size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Data</span>
-              </template>
+            </UFormField>
+            <UFormField label="Nazwa">
+              <UInput v-model="meetingForm.label" placeholder="Tytuł spotkania" size="lg" class="w-full" />
+            </UFormField>
+            <UFormField label="Data">
               <UInput v-model="meetingForm.dateInput" type="datetime-local" size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Link do spotkania</span>
-              </template>
-              <UInput v-model="meetingForm.meeting_url" placeholder="https://zoom.us/..." size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Link do nagrania</span>
-              </template>
+            </UFormField>
+            <UFormField label="Link do nagrania">
               <UInput v-model="meetingForm.video_url" placeholder="https://youtube.com/watch?v=..." size="lg" class="w-full" />
-            </UFormGroup>
-            <UFormGroup>
-              <template #label>
-                <span class="text-xs font-medium text-muted">Status spotkania</span>
-              </template>
+            </UFormField>
+            <UFormField label="Status spotkania">
               <UCheckbox
                 v-model="meetingForm.has_occurred"
                 label="Spotkanie odbyło się"
                 size="lg"
               />
-            </UFormGroup>
-            <UFormGroup class="md:col-span-2">
-              <template #label>
-                <span class="text-xs font-medium text-muted">Opis</span>
-              </template>
-              <UTextarea v-model="meetingForm.description" :rows="4" placeholder="Notatki do spotkania" class="text-base w-full" />
-            </UFormGroup>
+            </UFormField>
+            <UFormField label="Opis" class="md:col-span-2">
+              <UTextarea v-model="meetingForm.description" :rows="4" placeholder="Opis spotkania" class="text-base w-full" />
+            </UFormField>
           </div>
 
           <div class="mt-6 border-t pt-4">
