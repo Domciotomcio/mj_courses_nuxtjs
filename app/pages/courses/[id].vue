@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { useFirestore, useDocument, useCollection } from 'vuefire'
-import { collection, doc } from 'firebase/firestore'
+import { collection, doc, orderBy, query } from 'firebase/firestore'
 import { useRoute } from 'vue-router'
-import CourseMeetingItem from '~/components/CourseMeetingItem.vue'
 import CourseMeetings from '~/components/CourseMeetings.vue'
 import { computed } from 'vue'
+import { queryCollection } from '#imports'
 
 const route = useRoute()
 const router = useRouter()
@@ -51,9 +51,15 @@ const userOwnsCourse = computed(() => {
   return hasCourse
 })
 
+
 console.log('Course ID from route:', courseId)
 const course = useDocument(doc(collection(db, 'courses'), courseId))
 console.log(course)
+
+// Meetings live in a dedicated subcollection under each course
+const meetings = useCollection(
+  query(collection(db, 'courses', courseId, 'meetings'), orderBy('index', 'asc'))
+)
 
 // Load content based on course_markdown_name
 const { data: courseContent } = await useAsyncData(
@@ -207,7 +213,7 @@ onMounted(() => {
       <div class="flex flex-col md:flex-row md:items-start md:gap-8">
         <!-- Meetings column -->
         <div class="md:w-2/3">
-          <CourseMeetings :meetings="course?.meetings" />
+          <CourseMeetings :meetings="meetings" />
         </div>
 
         <!-- Summary column -->

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { collection, doc } from 'firebase/firestore'
+import { useCollection } from 'vuefire'
+import { collection, doc, orderBy, query } from 'firebase/firestore'
 
 definePageMeta({
   middleware: 'auth'
@@ -12,6 +13,11 @@ const userId = route.params.id as string
 
 // Load course from Firestore
 const course = useDocument(doc(collection(db, 'courses'), courseId))
+
+// Meetings are stored in a subcollection under the course
+const meetings = useCollection(
+  query(collection(db, 'courses', courseId, 'meetings'), orderBy('index', 'asc'))
+)
 
 // Load content based on course_markdown_name from user-courses folder
 const { data: courseContent } = await useAsyncData(
@@ -45,38 +51,25 @@ const getDateFromTimestamp = (date: any): Date | null => {
 
 // Find the next upcoming meeting
 const nextMeeting = computed(() => {
-  if (!course.value?.meetings || !course.value?.meeting_url) return null
-  
+  if (!meetings.value?.length) return null
+
   const now = new Date()
-  const upcomingMeetings = course.value.meetings
-    .filter(meeting => {
-      const meetingDate = getDateFromTimestamp(meeting.date)
-      return meetingDate && meetingDate > now
-    })
-    .sort((a, b) => {
-      const dateA = getDateFromTimestamp(a.date)
-      const dateB = getDateFromTimestamp(b.date)
-      return (dateA?.getTime() || 0) - (dateB?.getTime() || 0)
-    })
-  
+  const upcomingMeetings = meetings.value
+    .map(meeting => ({ ...meeting, parsedDate: getDateFromTimestamp(meeting.date) }))
+    .filter(meeting => meeting.parsedDate && meeting.parsedDate > now)
+    .sort((a, b) => (a.parsedDate?.getTime() || 0) - (b.parsedDate?.getTime() || 0))
+
   return upcomingMeetings[0] || null
 })
 
+const meetingDate = (meeting: any) => getDateFromTimestamp(meeting?.date)
+const meetingUrl = (meeting: any) => meeting?.meeting_url || course.value?.meeting_url || ''
+
 // Debug
 watchEffect(() => {
-  console.log('Course meetings:', course.value?.meetings)
-  console.log('Course meeting_url:', course.value?.meeting_url)
+  console.log('Meetings collection:', meetings.value)
+  console.log('Course meeting_url fallback:', course.value?.meeting_url)
   console.log('Next meeting:', nextMeeting.value)
-  if (course.value?.meetings) {
-    course.value.meetings.forEach((meeting, index) => {
-      const meetingDate = getDateFromTimestamp(meeting.date)
-      console.log(`Meeting ${index}:`, {
-        date: meeting.date,
-        parsedDate: meetingDate,
-        isInFuture: meetingDate ? meetingDate > new Date() : false
-      })
-    })
-  }
 })
 </script>
 
@@ -102,26 +95,27 @@ watchEffect(() => {
 
     <!-- Next Meeting Section -->
     <NextMeetingSection 
-      v-if="nextMeeting && course?.meeting_url" 
+      v-if="nextMeeting && meetingUrl(nextMeeting)" 
       :meeting="nextMeeting" 
-      :meetingUrl="course.meeting_url" 
+      :meetingUrl="meetingUrl(nextMeeting)" 
     />
 
     <div>
       <h3>Lista spotkań</h3>
 
-      <CourseMeetings :meetings="course?.meetings">
+      <CourseMeetings :meetings="meetings">
         <template #content="{ item }">
           <template v-if="item!.has_occurred === false">
             
             <div class="flex items-start">
               
               <div class="pb-3.5 text-sm text-muted flex-1 mr-4">
-                <p class="mb-4">Data spotkania: <NuxtTime :datetime="Date.now()" /></p>
+                <p v-if="meetingDate(item)" class="mb-4">Data spotkania: <NuxtTime :datetime="meetingDate(item)!" /></p>
+                <p v-else class="mb-4">Data spotkania: wkrótce</p>
                 <p>{{ item?.description }}</p>
               </div>
-              <div class="flex-shrink-0 pb-3.5">
-                <UButton :href="course?.meeting_url" target="_blank">
+              <div v-if="meetingUrl(item)" class="flex-shrink-0 pb-3.5">
+                <UButton :href="meetingUrl(item)" target="_blank">
                   <UIcon name="i-lucide-presentation" />
                   Dołącz do spotkania
                 </UButton>
