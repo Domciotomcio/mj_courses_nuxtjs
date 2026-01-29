@@ -4,6 +4,7 @@ import { collection } from 'firebase/firestore'
 import type { Course } from '../../../types/models/course'
 import { useAutoAnimate } from '@formkit/auto-animate/vue'
 import { CalendarDate, DateFormatter, getLocalTimeZone, type DateValue } from '@internationalized/date'
+import { useMediaQuery } from '@vueuse/core'
 import { pageCTA } from '#build/ui'
 
 const db = useFirestore()
@@ -28,6 +29,9 @@ const sortOptions = [
   { label: 'Cena: od najniższej', value: 'price-asc' },
   { label: 'Cena: od najwyższej', value: 'price-desc' }
 ]
+
+// Responsive helper for CTA layout
+const isMobile = useMediaQuery('(max-width: 767px)')
 
 // Scroll to section helper
 const scrollToSection = (sectionId: string) => {
@@ -233,7 +237,7 @@ const filteredCourses = computed(() => {
     </div>
 
     <!-- Courses -->
-    <div v-if="filteredCourses.length > 0" ref="coursesContainer" class="container px-12 space-y-6">
+    <div v-if="filteredCourses.length > 0" ref="coursesContainer" class="container px-6 md:px-8 space-y-6">
       <UPageCTA
       v-for="course in filteredCourses"
       :header="course.title"
@@ -259,12 +263,13 @@ const filteredCourses = computed(() => {
         }
       ]"
       variant="outline"
-      orientation="horizontal"
+      :orientation="isMobile ? 'vertical' : 'horizontal'"
+      :reverse="isMobile"
       >
       <template #description>
     <div class="space-y-6">
       
-      <p class="text-gray-600 dark:text-gray-300 text-lg">
+      <p class="text-gray-600 dark:text-gray-300 text-base md:text-lg">
       Kurs został stworzony z myślą o wszystkich, którzy pragną pogłębić swoją relację z Bogiem...
       </p>
 

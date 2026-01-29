@@ -65,7 +65,7 @@ const columns: FooterColumn[] = [
             </a>
           </div>
           <!-- Copyright - Bottom Right Corner -->
-          <p class="absolute bottom-0 right-0 text-muted text-xs">Misja Jonatan © {{ new Date().getFullYear() }}</p>
+          <p class="absolute bottom-0 right-0 text-muted text-xs">© {{ new Date().getFullYear() }} Kursy Misja Jonatan</p>
         </div>
       </UContainer>
     </template>

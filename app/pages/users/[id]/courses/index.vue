@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
-import NoCourseFound from '~/components/courses/NoCourseFound.vue'
 
 definePageMeta({
   middleware: 'auth'
@@ -40,8 +39,8 @@ watchEffect(() => {
           }"
         />
       </UBlogPosts>
-      <div v-else>
-        <NoCourseFound />
+      <div v-else class="flex items-center justify-center py-16 text-center text-lg text-muted">
+        Brak kursów do wyświetlenia
       </div>
     </div>
     <div v-else>

@@ -7,7 +7,7 @@ const props = defineProps<Props>()
 </script>
 
 <template>
-  <div class="text-sm text-muted flex-1 mr-4">
+  <div class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed break-words">
     <p>{{ props.item?.description || props.item?.content }}</p>
   </div>
 </template>

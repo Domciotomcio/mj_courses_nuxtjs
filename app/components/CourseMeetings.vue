@@ -74,18 +74,31 @@ const processedMeetings = computed(() => {
     <div class="p-0">
       <UAccordion type="multiple" :items="processedMeetings">
         <template #default="{ item, index, open }">
-          <div class="flex space-between w-full" :class="{ 'opacity-50': item.disabled }">
-            <div class="flex-1 min-w-0 text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+          <div
+            class="flex items-start justify-between gap-3 w-full px-2 py-2"
+            :class="{ 'opacity-50': item.disabled }"
+          >
+            <div class="flex-1 min-w-0 text-sm font-medium text-gray-700 dark:text-gray-200 leading-tight break-words">
               Spotkanie {{ index + 1 }} - {{ item?.label || 'Brak etykiety' }}
-              
             </div>
-            <div v-if="item?.date && getDateFromTimestamp(item.date)" class="flex-none ml-4 text-sm text-muted">
-              <NuxtTime :datetime="getDateFromTimestamp(item.date)!" locale="pl" day="numeric" month="short" year="numeric" hour="numeric" minute="numeric" />
+            <div
+              v-if="item?.date && getDateFromTimestamp(item.date)"
+              class="flex-none text-xs text-muted whitespace-nowrap"
+            >
+              <NuxtTime
+                :datetime="getDateFromTimestamp(item.date)!"
+                locale="pl"
+                day="numeric"
+                month="short"
+                year="numeric"
+                hour="numeric"
+                minute="numeric"
+              />
             </div>
           </div>
         </template>
         <template #content="{ item }">
-          <div class="">
+          <div class="px-3 pb-3">
             <!-- Use custom slot content if provided (for user view), otherwise use default CourseMeetingItem -->
             <slot name="content" :item="item">
               <CourseMeetingItem :item="item" />
