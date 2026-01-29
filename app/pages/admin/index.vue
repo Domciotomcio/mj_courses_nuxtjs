@@ -11,6 +11,33 @@ definePageMeta({
 const db = useFirestore()
 const toast = useToast()
 
+const ADMIN_PASSWORD = 'a1b2c3d4'
+const isUnlocked = ref(false)
+const passwordInput = ref('')
+
+onMounted(() => {
+  if (process.client) {
+    isUnlocked.value = sessionStorage.getItem('admin-pass-ok') === 'true'
+  }
+})
+
+const unlockAdmin = () => {
+  if (passwordInput.value === ADMIN_PASSWORD) {
+    isUnlocked.value = true
+    if (process.client) sessionStorage.setItem('admin-pass-ok', 'true')
+    toast.add({ title: 'Panel odblokowany', color: 'success', icon: 'i-lucide-lock-open' })
+    return
+  }
+
+  toast.add({ title: 'Nieprawidłowe hasło', color: 'error', icon: 'i-lucide-alert-triangle' })
+}
+
+const lockAdmin = () => {
+  isUnlocked.value = false
+  passwordInput.value = ''
+  if (process.client) sessionStorage.removeItem('admin-pass-ok')
+}
+
 const courses = useCollection<Course & { id: string; course_markdown_name?: string; image_1x1?: string; meeting_url?: string; features?: string[] }>(collection(db, 'courses'))
 const courseSearch = ref('')
 const selectedCourseId = ref<string | null>(null)
@@ -208,8 +235,12 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
 </script>
 
 <template>
-  <div class="container mx-auto px-6 py-10 space-y-8">
+  <div v-if="isUnlocked" class="container mx-auto px-6 py-10 space-y-8">
     <PageTitle title="Panel administratora" subtitle="Zarządzaj kursami i spotkaniami" />
+
+    <div class="flex justify-end">
+      <UButton color="neutral" variant="ghost" icon="i-lucide-lock" label="Zablokuj" size="sm" @click="lockAdmin" />
+    </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <UCard class="lg:col-span-1">
@@ -358,5 +389,24 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
         </UCard>
       </div>
     </div>
+  </div>
+
+  <div v-else class="container mx-auto px-6 py-16 max-w-xl">
+    <PageTitle title="Panel administratora" subtitle="Wprowadź hasło, aby kontynuować" />
+    <UCard>
+      <div class="space-y-4">
+        <p class="text-sm text-muted">Panel chronimy prostym hasłem. Podaj hasło, aby odblokować dostęp.</p>
+        <UFormField label="Hasło">
+          <UInput
+            v-model="passwordInput"
+            type="password"
+            placeholder="Wpisz hasło"
+            size="lg"
+            @keyup.enter="unlockAdmin"
+          />
+        </UFormField>
+        <UButton icon="i-lucide-lock-open" label="Odblokuj" block size="lg" @click="unlockAdmin" />
+      </div>
+    </UCard>
   </div>
 </template>
