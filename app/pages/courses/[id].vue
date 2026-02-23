@@ -185,7 +185,7 @@ onMounted(() => {
       description="Misja Jonatan - kursy online" 
       :headline="headlineText"
       orientation="horizontal"
-      :links="[{ label: 'Kup teraz', size: 'xl', icon: 'i-lucide-shopping-basket', onClick: scrollToPurchase }]"
+      :links="[{ label: 'Darowizna', size: 'xl', icon: 'i-lucide-heart', onClick: scrollToPurchase }]"
     >
       <img
         :src="course?.image_1x1"
@@ -262,7 +262,7 @@ onMounted(() => {
                   />
                 </UFormField>
                 <UButton
-                  label="Kup teraz"
+                  label="Darowizna"
                   size="lg"
                   block
                   @click="buyCourse(course?.id || courseId)"
