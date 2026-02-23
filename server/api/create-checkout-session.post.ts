@@ -61,6 +61,7 @@ export default defineEventHandler(async (event) => {
       quantity: 1,
     }],
     mode: 'payment',
+    submit_type: 'donate',
     success_url: `${baseUrl}/success`,
     cancel_url: `${baseUrl}/cancel`,
      metadata: { courseId: course.id, userUid: userUid },

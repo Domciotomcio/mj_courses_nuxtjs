@@ -246,7 +246,7 @@ const filteredCourses = computed(() => {
       :description="course.description"
       :links="course.is_finished ? [] : [{
         icon: 'i-lucide-shopping-cart',
-        label: 'Zakup kurs',
+        label: 'Przejdź do płatności',
         to: `/courses/${course.id}#summary`,
         color: 'neutral',
         variant: 'outline'

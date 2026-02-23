@@ -102,7 +102,7 @@ definePageMeta({
               <div>
                 <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Adres</p>
                 <p class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  Szafranowa 7 | 51-311 Kiełczówek
+                  Szafranowa 7A | 51-311 Kiełczówek
                 </p>
               </div>
             </div>

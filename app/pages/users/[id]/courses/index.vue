@@ -23,7 +23,7 @@ watchEffect(() => {
   <div>
     <!-- Header: centered PageTitle -->
     <div class="container mx-auto px-4 text-center mb-8">
-      <page-title title="Moje kursy" subtitle="Kursy zakupione przez ciebie" />
+      <page-title title="Moje kursy" subtitle="" />
     </div>
 
     <div v-if="user">

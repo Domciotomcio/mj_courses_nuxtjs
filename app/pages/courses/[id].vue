@@ -88,7 +88,7 @@ async function buyCourse(courseId: string) {
   if (!consentAccepted.value) {
     toast.add({
       title: 'Wymagana zgoda',
-      description: 'Musisz zaakceptować warunki dostarczenia treści cyfrowych, aby kontynuować zakup.',
+      description: 'Musisz zaakceptować warunki dostarczenia treści cyfrowych, aby kontynuować.',
       color: 'error',
       icon: 'i-lucide-alert-circle'
     })

@@ -9,7 +9,7 @@ const userId = computed(() => currentUser.value?.uid)
 <div class="flex flex-col items-center justify-center py-4">
   <UPricingPlan
     title="Płatność zakończona!"
-    description="Dziękujemy za zakup kursu. Twoja płatność została pomyślnie przetworzona."
+    description="Dziękujemy za wsparcie. Twoja płatność została pomyślnie przetworzona."
     badge="Sukces"
     :features="['Dostęp do kursu został przyznany', 'Potwierdzenie wysłane na e-mail', 'Możesz już korzystać z materiałów', 'W razie pytań skontaktuj się z nami']"
     :button="{ label: 'Przejdź do swoich kursów', color: 'primary', variant: 'outline', block: true, to: `/users/${userId}/courses` }"
