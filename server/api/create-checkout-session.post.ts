@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
   const baseUrl = `${protocol}://${host}`
 
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card', 'p24'],
+    payment_method_types: ['card', 'blik'],
     line_items: [{
       price_data: {
         currency: 'pln',
