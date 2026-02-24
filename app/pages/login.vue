@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth'
+import { GoogleAuthProvider, getRedirectResult, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, sendPasswordResetEmail } from 'firebase/auth'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
@@ -11,6 +11,7 @@ const toast = useToast()
 const error = ref(null)
 const loading = ref(false)
 const googleLoading = ref(false)
+const googleRedirectLoading = ref(false)
 const showReset = ref(false)
 const resetEmail = ref('')
 const resetEmailError = ref('')
@@ -20,7 +21,7 @@ const providers = computed(() => [{
     color: 'neutral' as const,
     variant: 'outline' as const,
     block: true,
-    loading: googleLoading.value,
+    loading: googleLoading.value || googleRedirectLoading.value,
     onClick: signInWithGoogle
 }])
 
@@ -107,6 +108,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 async function signInWithGoogle() {
     googleLoading.value = true
     const provider = new GoogleAuthProvider()
+    provider.setCustomParameters({ prompt: 'select_account' })
 
     try {
         const result = await signInWithPopup(auth, provider)
@@ -122,10 +124,25 @@ async function signInWithGoogle() {
     } catch (err: any) {
         console.error('Google login error:', err)
 
+        const shouldFallbackToRedirect = [
+            'auth/popup-blocked',
+            'auth/operation-not-supported-in-this-environment',
+            'auth/web-storage-unsupported'
+        ].includes(err?.code)
+
+        if (shouldFallbackToRedirect) {
+            googleRedirectLoading.value = true
+            await signInWithRedirect(auth, provider)
+            return
+        }
+
         const isPopupClosed = err?.code === 'auth/popup-closed-by-user'
+        const isUnauthorizedDomain = err?.code === 'auth/unauthorized-domain'
         const description = isPopupClosed
             ? 'Zamknięto okno logowania Google.'
-            : 'Nie udało się zalogować przez Google. Spróbuj ponownie.'
+            : isUnauthorizedDomain
+                ? 'Domena aplikacji nie została dodana do autoryzowanych domen Firebase Authentication.'
+                : 'Nie udało się zalogować przez Google. Spróbuj ponownie.'
 
         toast.add({
             title: 'Błąd logowania',
@@ -137,6 +154,33 @@ async function signInWithGoogle() {
         googleLoading.value = false
     }
 }
+
+onMounted(async () => {
+    try {
+        const result = await getRedirectResult(auth)
+
+        if (!result?.user) return
+
+        await ensureUserDocument(result.user)
+        await navigateTo('/courses')
+        toast.add({
+            title: 'Sukces',
+            description: 'Zalogowano za pomocą Google',
+            color: 'success',
+            icon: 'i-lucide-user-check'
+        })
+    } catch (err: any) {
+        console.error('Google redirect login error:', err)
+        toast.add({
+            title: 'Błąd logowania',
+            description: 'Nie udało się dokończyć logowania Google po przekierowaniu.',
+            color: 'error',
+            icon: 'i-lucide-alert-circle'
+        })
+    } finally {
+        googleRedirectLoading.value = false
+    }
+})
 
 const fields = [{
     name: 'email',

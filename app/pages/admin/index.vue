@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { addDoc, collection, doc, limit, orderBy, query, Timestamp, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, limit, orderBy, query, Timestamp, updateDoc } from 'firebase/firestore'
 import { useCollection, useFirestore } from 'vuefire'
 import type { Course, Meeting } from '~/types/models'
 
@@ -87,8 +87,13 @@ const resolveDate = (value: any): Date | null => {
 const toDateInputValue = (value: any) => {
   const date = resolveDate(value)
   if (!date) return ''
-  const iso = date.toISOString()
-  return iso.slice(0, 16)
+  const pad = (input: number) => String(input).padStart(2, '0')
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1)
+  const day = pad(date.getDate())
+  const hours = pad(date.getHours())
+  const minutes = pad(date.getMinutes())
+  return `${year}-${month}-${day}T${hours}:${minutes}`
 }
 
 watch(selectedCourse, course => {
@@ -159,6 +164,7 @@ interface MeetingFormState {
 
 const meetings = useCollection<MeetingDoc>(meetingsQuery)
 const selectedMeetingId = ref<string | null>(null)
+const isMeetingModalOpen = ref(false)
 const meetingForm = reactive<MeetingFormState>({
   id: undefined,
   label: '',
@@ -201,6 +207,16 @@ const selectMeeting = (meeting: MeetingDoc) => {
   meetingForm.has_occurred = Boolean(meeting.has_occurred)
 }
 
+const openNewMeetingModal = () => {
+  resetMeetingForm()
+  isMeetingModalOpen.value = true
+}
+
+const openEditMeetingModal = (meeting: MeetingDoc) => {
+  selectMeeting(meeting)
+  isMeetingModalOpen.value = true
+}
+
 const saveMeeting = async () => {
   if (!selectedCourseId.value) return
   savingMeeting.value = true
@@ -222,6 +238,7 @@ const saveMeeting = async () => {
       await addDoc(collection(db, 'courses', selectedCourseId.value, 'meetings'), payload)
       toast.add({ title: 'Spotkanie dodane', color: 'success', icon: 'i-lucide-check-circle' })
     }
+    isMeetingModalOpen.value = false
     resetMeetingForm()
   } catch (error) {
     console.error('Meeting save failed', error)
@@ -231,7 +248,27 @@ const saveMeeting = async () => {
   }
 }
 
+const deleteMeeting = async () => {
+  if (!selectedCourseId.value || !selectedMeetingId.value) return
+  savingMeeting.value = true
+  try {
+    await deleteDoc(doc(db, 'courses', selectedCourseId.value, 'meetings', selectedMeetingId.value))
+    toast.add({ title: 'Spotkanie usunięte', color: 'success', icon: 'i-lucide-check-circle' })
+    isMeetingModalOpen.value = false
+    resetMeetingForm()
+  } catch (error) {
+    console.error('Meeting delete failed', error)
+    toast.add({ title: 'Błąd usuwania', description: 'Sprawdź konsolę po szczegóły.', color: 'error', icon: 'i-lucide-alert-triangle' })
+  } finally {
+    savingMeeting.value = false
+  }
+}
+
 const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotkanie' : 'Dodaj spotkanie')
+
+watch(isMeetingModalOpen, open => {
+  if (!open) resetMeetingForm()
+})
 </script>
 
 <template>
@@ -283,13 +320,13 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
                 <p class="text-sm text-muted">Kurs</p>
                 <p class="text-lg font-semibold">Szczegóły</p>
               </div>
-              <UButton :loading="savingCourse" icon="i-lucide-save" label="Zapisz kurs" @click="updateCourse" />
+              <UButton :loading="savingCourse" icon="i-lucide-save" label="Zapisz zmiany kursu" @click="updateCourse" />
             </div>
           </template>
 
           <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <UFormField label="Tytuł">
-              <UInput v-model="courseForm.title" placeholder="Tytuł kursu" size="lg" class="w-full" />
+            <UFormField label="Tytuł kursu">
+              <UInput v-model="courseForm.title" color="primary" highlight placeholder="Tytuł kursu" size="lg" class="w-full" />
             </UFormField>
             <UFormField label="Podtytuł">
               <UInput v-model="courseForm.subtitle" placeholder="Krótki podtytuł" size="lg" class="w-full" />
@@ -300,14 +337,8 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
             <UFormField label="Cena (PLN)">
               <UInput v-model.number="courseForm.price" type="number" min="0" step="1" placeholder="199" size="lg" class="w-full" />
             </UFormField>
-            <UFormField label="Nazwa pliku markdown">
-              <UInput v-model="courseForm.course_markdown_name" placeholder="np. kurs-wiara" size="lg" class="w-full" />
-            </UFormField>
-            <UFormField label="Adres obrazka okładki">
-              <UInput v-model="courseForm.image_1x1" placeholder="/courses/example.jpg" size="lg" class="w-full" />
-            </UFormField>
             <UFormField label="Domyślny link do spotkań">
-              <UInput v-model="courseForm.meeting_url" placeholder="https://zoom.us/..." size="lg" class="w-full" />
+              <UInput v-model="courseForm.meeting_url" color="primary" highlight icon="i-simple-icons-googlemeet" placeholder="https://meet.google.com/abc-defg-hij" size="lg" class="w-full" />
             </UFormField>
             <UFormField label="Data startu">
               <UInput v-model="courseForm.dateInput" type="datetime-local" size="lg" class="w-full" />
@@ -330,39 +361,11 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-muted">Spotkania</p>
-                <p class="text-lg font-semibold">{{ meetingModeLabel }}</p>
+                <p class="text-lg font-semibold">Lista spotkań</p>
               </div>
-              <div class="flex items-center gap-2">
-                <UButton color="neutral" variant="ghost" icon="i-lucide-plus" label="Nowe" @click="resetMeetingForm" />
-                <UButton :loading="savingMeeting" icon="i-lucide-save" label="Zapisz spotkanie" @click="saveMeeting" />
-              </div>
+              <UButton color="neutral" variant="ghost" icon="i-lucide-plus" label="Dodaj nowe spotkanie" @click="openNewMeetingModal" />
             </div>
           </template>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <UFormField label="Kolejność">
-              <UInput v-model.number="meetingForm.index" type="number" min="1" step="1" size="lg" class="w-full" />
-            </UFormField>
-            <UFormField label="Nazwa">
-              <UInput v-model="meetingForm.label" placeholder="Tytuł spotkania" size="lg" class="w-full" />
-            </UFormField>
-            <UFormField label="Data">
-              <UInput v-model="meetingForm.dateInput" type="datetime-local" size="lg" class="w-full" />
-            </UFormField>
-            <UFormField label="Link do nagrania">
-              <UInput v-model="meetingForm.video_url" placeholder="https://youtube.com/watch?v=..." size="lg" class="w-full" />
-            </UFormField>
-            <UFormField label="Status spotkania">
-              <UCheckbox
-                v-model="meetingForm.has_occurred"
-                label="Spotkanie odbyło się"
-                size="lg"
-              />
-            </UFormField>
-            <UFormField label="Opis" class="md:col-span-2">
-              <UTextarea v-model="meetingForm.description" :rows="4" placeholder="Opis spotkania" class="text-base w-full" />
-            </UFormField>
-          </div>
 
           <div class="mt-6 border-t pt-4">
             <p class="text-sm font-semibold mb-3">Istniejące spotkania</p>
@@ -372,7 +375,7 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
                 :key="meeting.id"
                 class="cursor-pointer transition hover:border-primary"
                 :class="meeting.id === selectedMeetingId ? 'border-primary bg-primary/5' : 'border-default'"
-                @click="selectMeeting(meeting)"
+                @click="openEditMeetingModal(meeting)"
               >
                 <div class="flex items-center justify-between">
                   <div>
@@ -386,6 +389,60 @@ const meetingModeLabel = computed(() => selectedMeetingId.value ? 'Edytuj spotka
             </div>
             <div v-else class="text-sm text-muted">Brak spotkań.</div>
           </div>
+
+          <UModal
+            v-model:open="isMeetingModalOpen"
+            :title="meetingModeLabel"
+            description="Uzupełnij dane spotkania i zapisz zmiany."
+            :ui="{ footer: 'justify-end' }"
+          >
+            <template #body>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2 flex flex-col md:flex-row gap-4">
+                  <UFormField label="Kolejność" class="md:w-28 md:shrink-0">
+                    <UInput v-model.number="meetingForm.index" type="number" min="1" step="1" size="lg" class="w-full" />
+                  </UFormField>
+                  <UFormField label="Nazwa" class="flex-1">
+                    <UInput v-model="meetingForm.label" placeholder="Tytuł spotkania" size="lg" class="w-full" />
+                  </UFormField>
+                </div>
+                <UFormField label="Data">
+                  <UInput v-model="meetingForm.dateInput" type="datetime-local" size="lg" class="w-full" />
+                </UFormField>
+                <UFormField label="Link do nagrania">
+                  <UInput v-model="meetingForm.video_url" icon="i-lucide-youtube" highlight placeholder="https://youtube.com/watch?v=..." size="lg" class="w-full" />
+                </UFormField>
+                <UFormField label="Status spotkania">
+                  <UCheckbox
+                    v-model="meetingForm.has_occurred"
+                    label="Spotkanie odbyło się"
+                    size="lg"
+                  />
+                </UFormField>
+                <UFormField label="Opis" class="md:col-span-2">
+                  <UTextarea v-model="meetingForm.description" :rows="4" placeholder="Opis spotkania" class="text-base w-full" />
+                </UFormField>
+              </div>
+            </template>
+
+            <template #footer="{ close }">
+              <div class="flex items-center justify-between gap-2 w-full">
+                <UButton
+                  v-if="selectedMeetingId"
+                  color="error"
+                  variant="soft"
+                  icon="i-lucide-trash-2"
+                  label="Usuń spotkanie"
+                  :loading="savingMeeting"
+                  @click="deleteMeeting"
+                />
+                <div class="ml-auto flex items-center gap-2">
+                  <UButton color="neutral" variant="outline" @click="close">Anuluj</UButton>
+                  <UButton :loading="savingMeeting" icon="i-lucide-save" label="Zapisz zmiany" @click="saveMeeting" />
+                </div>
+              </div>
+            </template>
+          </UModal>
         </UCard>
       </div>
     </div>
