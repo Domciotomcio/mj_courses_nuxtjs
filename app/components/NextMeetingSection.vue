@@ -14,6 +14,7 @@ interface Meeting {
 interface Props {
   meeting: Meeting
   meetingUrl: string
+  isJoinActive: boolean
 }
 
 const props = defineProps<Props>()
@@ -68,8 +69,9 @@ const getDateFromTimestamp = (date: any): Date | null => {
         </div>
         <div class="flex-shrink-0">
           <UButton
-            :href="meetingUrl"
-            target="_blank"
+            :href="isJoinActive ? meetingUrl : undefined"
+            :target="isJoinActive ? '_blank' : undefined"
+            :disabled="!isJoinActive"
             size="xl"
             color="primary"
             icon="i-lucide-video"

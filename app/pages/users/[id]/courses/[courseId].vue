@@ -10,6 +10,7 @@ const route = useRoute()
 const db = useFirestore()
 const courseId = route.params.courseId as string
 const userId = route.params.id as string
+const JOIN_BUTTON_ACTIVE_WINDOW_MS = 120 * 60 * 1000 // minutes * seconds * milliseconds
 
 // Load course from Firestore
 const course = useDocument(doc(collection(db, 'courses'), courseId))
@@ -49,17 +50,52 @@ const getDateFromTimestamp = (date: any): Date | null => {
   return null
 }
 
+const now = ref(new Date())
+let nowInterval: ReturnType<typeof setInterval> | null = null
+
+onMounted(() => {
+  nowInterval = setInterval(() => {
+    now.value = new Date()
+  }, 30000)
+})
+
+onUnmounted(() => {
+  if (nowInterval) {
+    clearInterval(nowInterval)
+  }
+})
+
+const isMeetingJoinable = (meeting: any) => {
+  const parsedDate = getDateFromTimestamp(meeting?.date)
+  if (!parsedDate) return false
+
+  return now.value.getTime() <= parsedDate.getTime() + JOIN_BUTTON_ACTIVE_WINDOW_MS
+}
+
 // Find the next upcoming meeting
 const nextMeeting = computed(() => {
   if (!meetings.value?.length) return null
 
-  const now = new Date()
-  const upcomingMeetings = meetings.value
-    .map(meeting => ({ ...meeting, parsedDate: getDateFromTimestamp(meeting.date) }))
-    .filter(meeting => meeting.parsedDate && meeting.parsedDate > now)
-    .sort((a, b) => (a.parsedDate?.getTime() || 0) - (b.parsedDate?.getTime() || 0))
+  const nowTimestamp = now.value.getTime()
+  const relevantMeetings = meetings.value
+    .map(meeting => ({ meeting, parsedDate: getDateFromTimestamp(meeting.date) }))
+    .filter(meeting => {
+      if (!meeting.parsedDate) return false
+      return meeting.parsedDate.getTime() + JOIN_BUTTON_ACTIVE_WINDOW_MS >= nowTimestamp
+    })
+    .sort((a, b) => {
+      const aTime = a.parsedDate?.getTime() || 0
+      const bTime = b.parsedDate?.getTime() || 0
+      const aStarted = aTime <= nowTimestamp
+      const bStarted = bTime <= nowTimestamp
 
-  return upcomingMeetings[0] || null
+      if (aStarted && bStarted) return bTime - aTime
+      if (aStarted && !bStarted) return -1
+      if (!aStarted && bStarted) return 1
+      return aTime - bTime
+    })
+
+  return relevantMeetings[0]?.meeting || null
 })
 
 const meetingDate = (meeting: any) => getDateFromTimestamp(meeting?.date)
@@ -98,6 +134,7 @@ watchEffect(() => {
       v-if="nextMeeting && meetingUrl(nextMeeting)" 
       :meeting="nextMeeting" 
       :meetingUrl="meetingUrl(nextMeeting)" 
+      :isJoinActive="isMeetingJoinable(nextMeeting)"
     />
 
     <div>
